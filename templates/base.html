@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Painel Motores & Sensores</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(180deg, #f8f9fa, #ffffff);
+        }
+
+        nav a {
+            color: #ff4da6 !important;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
+        <div class="container">
+            <a class="navbar-brand" href="/">🏎️ Projeto Motores</a>
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="{% url 'sensores:listar_motor' %}">Motores</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'sensores:listar_sensor' %}">Sensores</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'sensores:listar_sensormotor' %}">Motor +
+                            Sensor</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'sensores:listar_dados' %}">Dados</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-4">
+        {% block content %}{% endblock %}
+    </div>
+</body>
+
+</html>
