@@ -19,10 +19,9 @@ class SensorForm(forms.ModelForm):
     """
     class Meta:
         model = Sensor
-        fields = ['tipo', 'precisao']
+        fields = ['tipo']
         widgets = {
             'tipo': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Tipo do sensor'}),
-            'precisao': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Precisão'}),
         }
 
 class DadosForm(forms.ModelForm):

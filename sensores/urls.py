@@ -1,9 +1,14 @@
 from django.urls import path
+from django.shortcuts import redirect
 from . import views
 
 app_name = 'sensores'
 
+def home_redirect(request):
+    return redirect('sensores:listar_motor')
+
 urlpatterns = [
+    path('', home_redirect, name='home'),
     path('motores/', views.ListarMotorView.as_view(), name='listar_motor'),
     path('motores/criar/', views.CriarMotorView.as_view(), name='criar_motor'),
     path('motores/<int:pk>/atualizar/',

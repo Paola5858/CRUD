@@ -1,0 +1,10 @@
+{% extends 'sensores/base.html' %}
+
+{% block content %}
+<h1>{% if form.instance.pk %}Editar Dados do Sensor{% else %}Adicionar Dados do Sensor{% endif %}</h1>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">Salvar</button>
+</form>
+{% endblock %}

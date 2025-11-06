@@ -24,9 +24,6 @@
             <p class="lead">Monitoramento de motores e sensores</p>
         </div>
     </header>
-    <main>
-        {% block content %}{% endblock %}
-    </main>
     <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
         <div class="container">
             <a class="navbar-brand" href="/">🏎️ Projeto Motores</a>
@@ -34,8 +31,6 @@
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item"><a class="nav-link" href="{% url 'sensores:listar_motor' %}">Motores</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'sensores:listar_sensor' %}">Sensores</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'sensores:listar_sensormotor' %}">Motor +
-                            Sensor</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'sensores:listar_dados' %}">Dados</a></li>
                 </ul>
             </div>

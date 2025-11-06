@@ -1,0 +1,12 @@
+{% extends 'sensores/base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1 class="my-4">Dashboard</h1>
+    <div class="list-group">
+        <a href="{% url 'sensores:motor_list' %}" class="list-group-item list-group-item-action">Ver Motores</a>
+        <a href="{% url 'sensores:sensor_list' %}" class="list-group-item list-group-item-action">Ver Sensores</a>
+        <a href="{% url 'sensores:dados_list' %}" class="list-group-item list-group-item-action">Ver Dados dos Sensores</a>
+    </div>
+</div>
+{% endblock %}

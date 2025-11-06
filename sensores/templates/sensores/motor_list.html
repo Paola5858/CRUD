@@ -1,14 +1,17 @@
-{% extends 'base.html' %}
+{% extends 'sensores/base.html' %}
 
 {% block content %}
 <h1>Motores</h1>
-<a href="{% url 'sensores:criar_motor' %}" class="btn btn-primary">Criar Motor</a>
-<ul>
-{% for motor in objects %}
-    <li>{{ motor.nome }} - {{ motor.tipo }} - {{ motor.potencia }} kW
-        <a href="{% url 'sensores:atualizar_motor' motor.pk %}">Editar</a>
-        <a href="{% url 'sensores:deletar_motor' motor.pk %}">Deletar</a>
-    </li>
-{% endfor %}
+<a href="{% url 'sensores:criar_motor' %}" class="btn btn-primary mb-3">Novo Motor</a>
+<ul class="list-group">
+    {% for motor in motor_list %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+            {{ motor.nome }} - {{ motor.potencia }} kW
+            <div>
+                <a href="{% url 'sensores:atualizar_motor' motor.pk %}" class="btn btn-secondary btn-sm">Editar</a>
+                <a href="{% url 'sensores:deletar_motor' motor.pk %}" class="btn btn-danger btn-sm">Deletar</a>
+            </div>
+        </li>
+    {% endfor %}
 </ul>
 {% endblock %}

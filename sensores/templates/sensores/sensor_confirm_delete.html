@@ -1,0 +1,11 @@
+{% extends 'sensores/base.html' %}
+
+{% block content %}
+<h1>Confirmar Deleção</h1>
+<p>Você tem certeza que quer deletar o sensor "{{ object.tipo }}"?</p>
+<form method="post">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">Confirmar</button>
+    <a href="{% url 'sensores:sensor_list' %}" class="btn btn-secondary">Cancelar</a>
+</form>
+{% endblock %}
