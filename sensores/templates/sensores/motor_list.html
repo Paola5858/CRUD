@@ -1,86 +1,17 @@
-{% extends 'sensores/base.html' %}
+{% extends 'base.html' %}
 
-{% block title %}Motores - MOTOSENSE{% endblock %}
-
-{% block breadcrumb_items %}
-<li class="breadcrumb-item active">Motores</li>
-{% endblock %}
+{% block title %}Lista de Motores{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h1>🏎️ Motores</h1>
-    <a href="{% url 'sensores:criar_motor' %}" class="btn btn-primary">
-        <i class="fas fa-plus"></i> Novo Motor
-    </a>
-</div>
-
-<div class="row">
-    <div class="col-12">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="mb-0">Lista de Motores</h5>
-            </div>
-            <div class="card-body">
-                {% if motor_list %}
-                    <div class="table-responsive">
-                        <div class="mb-3">
-                            <input type="text" id="searchInput" class="form-control" placeholder="🔍 Buscar motores...">
-                        </div>
-                        <table class="table table-hover">
-                            <thead class="table-dark">
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Nome</th>
-                                    <th>Potência (kW)</th>
-                                    <th>Criado em</th>
-                                    <th class="text-center">Ações</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for motor in motor_list %}
-                                    <tr class="motor-row" data-id="{{ motor.pk }}">
-                                        <td><strong>#{{ motor.pk }}</strong></td>
-                                        <td>
-                                            <div class="d-flex align-items-center">
-                                                <span class="badge bg-primary me-2">🏎️</span>
-                                                {{ motor.nome }}
-                                            </div>
-                                        </td>
-                                        <td>{{ motor.potencia }}</td>
-                                        <td>{{ motor.criado_em|date:"d/m/Y H:i" }}</td>
-                                        <td class="text-center">
-                                            <div class="btn-group" role="group">
-                                                <a href="{% url 'sensores:atualizar_motor' motor.pk %}" 
-                                                   class="btn btn-outline-primary btn-sm" 
-                                                   title="Editar">
-                                                    <i class="fas fa-edit"></i>
-                                                </a>
-                                                <a href="{% url 'sensores:deletar_motor' motor.pk %}" 
-                                                   class="btn btn-outline-danger btn-sm" 
-                                                   title="Deletar">
-                                                    <i class="fas fa-trash"></i>
-                                                </a>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                {% else %}
-                    <div class="text-center py-5">
-                        <div class="mb-3">
-                            <i class="fas fa-car fa-3x text-muted"></i>
-                        </div>
-                        <h5 class="text-muted">Nenhum motor cadastrado</h5>
-                        <p class="text-muted">Clique em "Novo Motor" para começar</p>
-                        <a href="{% url 'sensores:criar_motor' %}" class="btn btn-primary">
-                            <i class="fas fa-plus"></i> Criar Primeiro Motor
-                        </a>
-                    </div>
-                {% endif %}
-            </div>
-        </div>
-    </div>
-</div>
+<a href="{url "criar_motor" %}"
+<h1>Motores</h1>
+<a href="{% url 'sensores:criar_motor' %}" class="btn btn-primary">Criar Motor</a>
+<ul>
+{% for motor in objects %}
+    <li>{{ motor.nome }} - {{ motor.tipo }} - {{ motor.potencia }} kW
+        <a href="{% url 'sensores:atualizar_motor' motor.pk %}">Editar</a>
+        <a href="{% url 'sensores:deletar_motor' motor.pk %}">Deletar</a>
+    </li>
+{% endfor %}
+</ul>
 {% endblock %}
