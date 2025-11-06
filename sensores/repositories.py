@@ -1,5 +1,5 @@
 from django.db import models
-from .models import Motor, Sensor, DadosSensor
+from .models import Motor, Sensor, DadosSensor, SensorMotor
 
 class BaseRepository:
     def __init__(self, model):
@@ -36,3 +36,7 @@ class SensorRepository(BaseRepository):
 class DadosSensorRepository(BaseRepository):
     def __init__(self):
         super().__init__(DadosSensor)
+
+class SensorMotorRepository(BaseRepository):
+    def __init__(self):
+        super().__init__(SensorMotor)

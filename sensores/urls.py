@@ -5,7 +5,7 @@ from . import views
 app_name = 'sensores'
 
 def home_redirect(request):
-    return redirect('sensores:listar_motor')
+    return redirect('dashboard:index')
 
 urlpatterns = [
     path('', home_redirect, name='home'),
@@ -27,4 +27,10 @@ urlpatterns = [
          views.AtualizarDadosView.as_view(), name='atualizar_dados'),
     path('dados/<int:pk>/deletar/',
          views.DeletarDadosView.as_view(), name='deletar_dados'),
+    path('sensor-motor/', views.ListarSensorMotorView.as_view(), name='listar_sensormotor'),
+    path('sensor-motor/criar/', views.CriarSensorMotorView.as_view(), name='criar_sensormotor'),
+    path('sensor-motor/<int:pk>/atualizar/',
+         views.AtualizarSensorMotorView.as_view(), name='atualizar_sensormotor'),
+    path('sensor-motor/<int:pk>/deletar/',
+         views.DeletarSensorMotorView.as_view(), name='deletar_sensormotor'),
 ]

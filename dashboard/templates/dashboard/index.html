@@ -1,0 +1,113 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Sensores</title>
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="{% static 'dashboard/css/style.css' %}">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                <span class="icon">⚙️</span>
+                <span class="text">MOTOSENSE</span>
+            </div>
+            
+            <nav class="nav-menu">
+                <a href="#" class="nav-item active">
+                    <span class="icon">📊</span>
+                    <span class="text">Dashboard</span>
+                </a>
+                <a href="{% url 'sensores:listar_motor' %}" class="nav-item">
+                    <span class="icon">🏎️</span>
+                    <span class="text">Motores</span>
+                </a>
+                <a href="{% url 'sensores:listar_sensor' %}" class="nav-item">
+                    <span class="icon">📡</span>
+                    <span class="text">Sensores</span>
+                </a>
+                <a href="{% url 'sensores:listar_dados' %}" class="nav-item">
+                    <span class="icon">📈</span>
+                    <span class="text">Dados</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <span class="icon">📋</span>
+                    <span class="text">Relatórios</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <span class="icon">⚙️</span>
+                    <span class="text">Configurações</span>
+                </a>
+            </nav>
+        </aside>
+        
+        <!-- Conteúdo Principal -->
+        <main class="main-content">
+            <!-- Header com Filtros -->
+            <header class="dashboard-header">
+                <div class="title-section">
+                    <h1>Visão Geral - Sensores</h1>
+                    <p class="subtitle">Monitoramento em tempo real</p>
+                </div>
+                
+                <div class="filters">
+                    <select id="filter-period" class="filter-select">
+                        <option value="monthly">Mensal</option>
+                        <option value="weekly">Semanal</option>
+                        <option value="daily">Diário</option>
+                    </select>
+                    
+                    <select id="filter-year" class="filter-select">
+                        <option value="2025">2025</option>
+                        <option value="2024">2024</option>
+                    </select>
+                </div>
+            </header>
+            
+            <!-- Grid de Métricas -->
+            <div class="metrics-grid">
+                <!-- Gráfico Principal -->
+                <section class="chart-main-container">
+                    <div class="chart-header">
+                        <div class="metric-highlight">
+                            <div class="metric-value" id="growth-percentage">+47.8%</div>
+                            <div class="metric-label">Crescimento mensal</div>
+                            <div class="metric-subtext" id="total-readings">15.847 leituras</div>
+                        </div>
+                    </div>
+                    <canvas id="chart-main" class="chart-canvas"></canvas>
+                </section>
+                
+                <!-- Gráfico de Rosca -->
+                <section class="chart-donut-container">
+                    <h3>Distribuição Sensores</h3>
+                    <canvas id="chart-donut" class="chart-canvas"></canvas>
+                </section>
+                
+                <!-- Painel de Status -->
+                <section class="status-panel">
+                    <div class="panel-header">
+                        <h3>Motores</h3>
+                        <span class="status-badge online" id="online-count">8 online</span>
+                    </div>
+                    
+                    <div class="status-list" id="motor-status-list">
+                        <!-- Conteúdo carregado via JS -->
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+    
+    <!-- JavaScript -->
+    <script src="{% static 'dashboard/js/dashboard.js' %}"></script>
+</body>
+</html>

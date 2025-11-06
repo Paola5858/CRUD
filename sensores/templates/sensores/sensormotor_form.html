@@ -1,6 +1,6 @@
 {% extends 'sensores/base.html' %}
 
-{% block title %}{% if form.instance.pk %}Editar Sensor{% else %}Criar Sensor{% endif %} - MOTOSENSE{% endblock %}
+{% block title %}{% if form.instance.pk %}Editar Associação{% else %}Criar Associação{% endif %} - MOTOSENSE{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center">
@@ -9,32 +9,33 @@
             <div class="card-header">
                 <h5 class="mb-0">
                     {% if form.instance.pk %}
-                        📝 Editar Sensor
+                        📝 Editar Associação Sensor-Motor
                     {% else %}
-                        ➕ Criar Novo Sensor
+                        ➕ Criar Nova Associação
                     {% endif %}
                 </h5>
             </div>
             <div class="card-body">
-                <form method="post" id="sensorForm">
+                <form method="post" id="sensorMotorForm">
                     {% csrf_token %}
                     <div class="mb-3">
-                        <label for="{{ form.tipo.id_for_label }}" class="form-label">Tipo do Sensor *</label>
-                        {{ form.tipo }}
-                        <div class="invalid-feedback" id="tipo-error"></div>
+                        <label for="{{ form.motor.id_for_label }}" class="form-label">Motor *</label>
+                        {{ form.motor }}
+                        <div class="invalid-feedback" id="motor-error"></div>
+                        <div class="form-text">Selecione o motor para associar</div>
                     </div>
                     <div class="mb-3">
-                        <label for="{{ form.precisao.id_for_label }}" class="form-label">Precisão *</label>
-                        {{ form.precisao }}
-                        <div class="invalid-feedback" id="precisao-error"></div>
-                        <div class="form-text">Valor numérico da precisão do sensor</div>
+                        <label for="{{ form.sensor.id_for_label }}" class="form-label">Sensor *</label>
+                        {{ form.sensor }}
+                        <div class="invalid-feedback" id="sensor-error"></div>
+                        <div class="form-text">Selecione o sensor para associar</div>
                     </div>
                     <div class="d-flex gap-2">
                         <button type="submit" class="btn btn-primary" id="submitBtn">
                             <span class="spinner-border spinner-border-sm d-none" id="loadingSpinner"></span>
                             <i class="fas fa-save" id="saveIcon"></i> Salvar
                         </button>
-                        <a href="{% url 'sensores:listar_sensor' %}" class="btn btn-secondary">
+                        <a href="{% url 'sensores:listar_sensormotor' %}" class="btn btn-secondary">
                             <i class="fas fa-arrow-left"></i> Voltar
                         </a>
                     </div>
@@ -45,28 +46,28 @@
 </div>
 
 <script>
-document.getElementById('sensorForm').addEventListener('submit', function(e) {
+document.getElementById('sensorMotorForm').addEventListener('submit', function(e) {
     const submitBtn = document.getElementById('submitBtn');
     const loadingSpinner = document.getElementById('loadingSpinner');
     const saveIcon = document.getElementById('saveIcon');
     
     // Validação frontend
     let isValid = true;
-    const tipo = document.getElementById('{{ form.tipo.id_for_label }}');
-    const precisao = document.getElementById('{{ form.precisao.id_for_label }}');
+    const motor = document.getElementById('{{ form.motor.id_for_label }}');
+    const sensor = document.getElementById('{{ form.sensor.id_for_label }}');
     
     // Reset errors
     document.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
     
-    if (!tipo.value.trim()) {
-        tipo.classList.add('is-invalid');
-        document.getElementById('tipo-error').textContent = 'Tipo é obrigatório';
+    if (!motor.value) {
+        motor.classList.add('is-invalid');
+        document.getElementById('motor-error').textContent = 'Selecione um motor';
         isValid = false;
     }
     
-    if (!precisao.value || precisao.value <= 0) {
-        precisao.classList.add('is-invalid');
-        document.getElementById('precisao-error').textContent = 'Precisão deve ser um valor positivo';
+    if (!sensor.value) {
+        sensor.classList.add('is-invalid');
+        document.getElementById('sensor-error').textContent = 'Selecione um sensor';
         isValid = false;
     }
     

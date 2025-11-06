@@ -1,20 +1,50 @@
 from django.views import View
 from django.shortcuts import render
+from django.http import Http404
+from django.contrib import messages
+from django.db import IntegrityError
+import logging
 from .factories import CrudFactory
+
+logger = logging.getLogger(__name__)
 
 class CrudView(View):
     model_name = None
     action = None
 
     def dispatch(self, request, *args, **kwargs):
-        self.strategy = CrudFactory.get_strategy(self.model_name, self.action)
-        return super().dispatch(request, *args, **kwargs)
+        try:
+            self.strategy = CrudFactory.get_strategy(self.model_name, self.action)
+            return super().dispatch(request, *args, **kwargs)
+        except ValueError as e:
+            logger.error(f"Erro na factory: {e}")
+            raise Http404("Recurso não encontrado")
+        except Exception as e:
+            logger.error(f"Erro inesperado: {e}")
+            messages.error(request, "Ocorreu um erro inesperado. Tente novamente.")
+            return render(request, '500.html', status=500)
 
     def get(self, request, *args, **kwargs):
-        return self.strategy.handle_request(request, *args, **kwargs)
+        try:
+            return self.strategy.handle_request(request, *args, **kwargs)
+        except Http404:
+            raise
+        except Exception as e:
+            logger.error(f"Erro no GET: {e}")
+            messages.error(request, "Erro ao carregar a página.")
+            return render(request, '500.html', status=500)
 
     def post(self, request, *args, **kwargs):
-        return self.strategy.handle_request(request, *args, **kwargs)
+        try:
+            return self.strategy.handle_request(request, *args, **kwargs)
+        except IntegrityError as e:
+            logger.error(f"Erro de integridade: {e}")
+            messages.error(request, "Erro de dados. Verifique as informações e tente novamente.")
+            return self.get(request, *args, **kwargs)
+        except Exception as e:
+            logger.error(f"Erro no POST: {e}")
+            messages.error(request, "Erro ao processar a solicitação.")
+            return self.get(request, *args, **kwargs)
 
 class ListarMotorView(CrudView):
     model_name = 'motor'
@@ -62,4 +92,20 @@ class AtualizarDadosView(CrudView):
 
 class DeletarDadosView(CrudView):
     model_name = 'dados'
+    action = 'delete'
+
+class ListarSensorMotorView(CrudView):
+    model_name = 'sensormotor'
+    action = 'list'
+
+class CriarSensorMotorView(CrudView):
+    model_name = 'sensormotor'
+    action = 'create'
+
+class AtualizarSensorMotorView(CrudView):
+    model_name = 'sensormotor'
+    action = 'update'
+
+class DeletarSensorMotorView(CrudView):
+    model_name = 'sensormotor'
     action = 'delete'

@@ -1,4 +1,4 @@
-from .repositories import MotorRepository, SensorRepository, DadosSensorRepository
+from .repositories import MotorRepository, SensorRepository, DadosSensorRepository, SensorMotorRepository
 
 class BaseService:
     def __init__(self, repository):
@@ -30,3 +30,7 @@ class SensorService(BaseService):
 class DadosSensorService(BaseService):
     def __init__(self):
         super().__init__(DadosSensorRepository())
+
+class SensorMotorService(BaseService):
+    def __init__(self):
+        super().__init__(SensorMotorRepository())

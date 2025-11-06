@@ -1,5 +1,5 @@
 from django import forms
-from .models import Motor, Sensor, DadosSensor
+from .models import Motor, Sensor, DadosSensor, SensorMotor
 
 class MotorForm(forms.ModelForm):
     """
@@ -19,9 +19,10 @@ class SensorForm(forms.ModelForm):
     """
     class Meta:
         model = Sensor
-        fields = ['tipo']
+        fields = ['tipo', 'precisao']
         widgets = {
             'tipo': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Tipo do sensor'}),
+            'precisao': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Precisão'}),
         }
 
 class DadosForm(forms.ModelForm):
@@ -35,4 +36,16 @@ class DadosForm(forms.ModelForm):
             'motor': forms.Select(attrs={'class': 'form-control'}),
             'sensor': forms.Select(attrs={'class': 'form-control'}),
             'valor': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Valor coletado'}),
+        }
+
+class SensorMotorForm(forms.ModelForm):
+    """
+    Formulário para o modelo SensorMotor.
+    """
+    class Meta:
+        model = SensorMotor
+        fields = ['motor', 'sensor']
+        widgets = {
+            'motor': forms.Select(attrs={'class': 'form-control'}),
+            'sensor': forms.Select(attrs={'class': 'form-control'}),
         }

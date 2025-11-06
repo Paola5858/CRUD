@@ -1,0 +1,96 @@
+{% extends 'sensores/base.html' %}
+
+{% block title %}{% if form.instance.pk %}Editar Dados{% else %}Adicionar Dados{% endif %} - MOTOSENSE{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    {% if form.instance.pk %}
+                        📝 Editar Dados do Sensor
+                    {% else %}
+                        ➕ Adicionar Novos Dados
+                    {% endif %}
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="post" id="dadosForm">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="{{ form.motor.id_for_label }}" class="form-label">Motor *</label>
+                        {{ form.motor }}
+                        <div class="invalid-feedback" id="motor-error"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="{{ form.sensor.id_for_label }}" class="form-label">Sensor *</label>
+                        {{ form.sensor }}
+                        <div class="invalid-feedback" id="sensor-error"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="{{ form.valor.id_for_label }}" class="form-label">Valor Coletado *</label>
+                        {{ form.valor }}
+                        <div class="invalid-feedback" id="valor-error"></div>
+                        <div class="form-text">Valor numérico coletado pelo sensor</div>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary" id="submitBtn">
+                            <span class="spinner-border spinner-border-sm d-none" id="loadingSpinner"></span>
+                            <i class="fas fa-save" id="saveIcon"></i> Salvar
+                        </button>
+                        <a href="{% url 'sensores:listar_dados' %}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Voltar
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('dadosForm').addEventListener('submit', function(e) {
+    const submitBtn = document.getElementById('submitBtn');
+    const loadingSpinner = document.getElementById('loadingSpinner');
+    const saveIcon = document.getElementById('saveIcon');
+    
+    // Validação frontend
+    let isValid = true;
+    const motor = document.getElementById('{{ form.motor.id_for_label }}');
+    const sensor = document.getElementById('{{ form.sensor.id_for_label }}');
+    const valor = document.getElementById('{{ form.valor.id_for_label }}');
+    
+    // Reset errors
+    document.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+    
+    if (!motor.value) {
+        motor.classList.add('is-invalid');
+        document.getElementById('motor-error').textContent = 'Selecione um motor';
+        isValid = false;
+    }
+    
+    if (!sensor.value) {
+        sensor.classList.add('is-invalid');
+        document.getElementById('sensor-error').textContent = 'Selecione um sensor';
+        isValid = false;
+    }
+    
+    if (!valor.value || isNaN(valor.value)) {
+        valor.classList.add('is-invalid');
+        document.getElementById('valor-error').textContent = 'Valor deve ser numérico';
+        isValid = false;
+    }
+    
+    if (!isValid) {
+        e.preventDefault();
+        return;
+    }
+    
+    // Loading state
+    submitBtn.disabled = true;
+    loadingSpinner.classList.remove('d-none');
+    saveIcon.classList.add('d-none');
+});
+</script>
+{% endblock %}

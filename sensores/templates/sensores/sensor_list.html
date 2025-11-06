@@ -1,17 +1,46 @@
 {% extends 'sensores/base.html' %}
 
+{% block title %}Sensores - MOTOSENSE{% endblock %}
+
 {% block content %}
-<h1>Sensores</h1>
-<a href="{% url 'sensores:criar_sensor' %}" class="btn btn-primary mb-3">Novo Sensor</a>
-<ul class="list-group">
-    {% for sensor in sensor_list %}
-        <li class="list-group-item d-flex justify-content-between align-items-center">
-            {{ sensor.tipo }}
-            <div>
-                <a href="{% url 'sensores:atualizar_sensor' sensor.pk %}" class="btn btn-secondary btn-sm">Editar</a>
-                <a href="{% url 'sensores:deletar_sensor' sensor.pk %}" class="btn btn-danger btn-sm">Deletar</a>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>📡 Sensores</h1>
+    <a href="{% url 'sensores:criar_sensor' %}" class="btn btn-primary">
+        <i class="fas fa-plus"></i> Novo Sensor
+    </a>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Lista de Sensores</h5>
             </div>
-        </li>
-    {% endfor %}
-</ul>
+            <div class="card-body">
+                {% if sensor_list %}
+                    <div class="list-group list-group-flush">
+                        {% for sensor in sensor_list %}
+                            <div class="list-group-item d-flex justify-content-between align-items-center sensor-card">
+                                <div>
+                                    <h6 class="mb-1">{{ sensor.tipo }}</h6>
+                                    <p class="mb-1 text-muted">Precisão: {{ sensor.precisao }}</p>
+                                    <small class="text-muted">Criado em: {{ sensor.criado_em|date:"d/m/Y H:i" }}</small>
+                                </div>
+                                <div>
+                                    <a href="{% url 'sensores:atualizar_sensor' sensor.pk %}" class="btn btn-outline-primary btn-sm me-2">Editar</a>
+                                    <a href="{% url 'sensores:deletar_sensor' sensor.pk %}" class="btn btn-outline-danger btn-sm">Deletar</a>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-5">
+                        <h5 class="text-muted">Nenhum sensor cadastrado</h5>
+                        <p class="text-muted">Clique em "Novo Sensor" para começar</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

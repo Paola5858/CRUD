@@ -1,10 +1,47 @@
 {% extends 'sensores/base.html' %}
 
+{% block title %}{% if form.instance.pk %}Editar Motor{% else %}Criar Motor{% endif %} - MOTOSENSE{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item"><a href="{% url 'sensores:listar_motor' %}">Motores</a></li>
+<li class="breadcrumb-item active">{% if form.instance.pk %}Editar{% else %}Criar{% endif %}</li>
+{% endblock %}
+
 {% block content %}
-<h1>{% if form.instance.pk %}Editar Motor{% else %}Criar Motor{% endif %}</h1>
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type-="submit" class="btn btn-primary">Salvar</button>
-</form>
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    {% if form.instance.pk %}
+                        📝 Editar Motor
+                    {% else %}
+                        ➕ Criar Novo Motor
+                    {% endif %}
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="{{ form.nome.id_for_label }}" class="form-label">Nome do Motor</label>
+                        {{ form.nome }}
+                    </div>
+                    <div class="mb-3">
+                        <label for="{{ form.potencia.id_for_label }}" class="form-label">Potência (kW)</label>
+                        {{ form.potencia }}
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Salvar
+                        </button>
+                        <a href="{% url 'sensores:listar_motor' %}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Voltar
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

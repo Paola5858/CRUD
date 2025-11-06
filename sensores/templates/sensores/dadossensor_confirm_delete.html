@@ -1,6 +1,6 @@
 {% extends 'sensores/base.html' %}
 
-{% block title %}Deletar Motor - MOTOSENSE{% endblock %}
+{% block title %}Deletar Dados - MOTOSENSE{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center">
@@ -16,17 +16,17 @@
                     <strong>Atenção!</strong> Esta ação não pode ser desfeita.
                 </div>
                 
-                <p>Tem certeza que deseja deletar o motor:</p>
+                <p>Tem certeza que deseja deletar estes dados:</p>
                 <div class="bg-light p-3 rounded mb-3">
-                    <h6><strong>{{ object.nome }}</strong></h6>
-                    <p class="mb-1">Potência: {{ object.potencia }} kW</p>
-                    <small class="text-muted">Criado em: {{ object.criado_em|date:"d/m/Y H:i" }}</small>
+                    <h6><strong>{{ object.motor.nome }} - {{ object.sensor.tipo }}</strong></h6>
+                    <p class="mb-1">Valor: {{ object.valor }}</p>
+                    <small class="text-muted">Coletado em: {{ object.data_hora|date:"d/m/Y H:i:s" }}</small>
                 </div>
                 
                 <form method="post" id="deleteForm">
                     {% csrf_token %}
                     <div class="d-flex gap-2 justify-content-end">
-                        <a href="{% url 'sensores:listar_motor' %}" class="btn btn-secondary">
+                        <a href="{% url 'sensores:listar_dados' %}" class="btn btn-secondary">
                             <i class="fas fa-times"></i> Cancelar
                         </a>
                         <button type="submit" class="btn btn-danger" id="deleteBtn">

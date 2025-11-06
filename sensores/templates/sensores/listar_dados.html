@@ -1,19 +1,46 @@
 {% extends 'sensores/base.html' %}
 
+{% block title %}Dados - MOTOSENSE{% endblock %}
+
 {% block content %}
-<div class="container">
-  <h1>Dados</h1>
-  <a href="{% url 'sensores:criar_dados' %}" class="btn btn-primary mb-3">Adicionar Dados</a>
-  <ul class="list-group">
-  {% for dado in dados_list %}
-      <li class="list-group-item d-flex justify-content-between align-items-center">
-          {{ dado.motor.nome }} - {{ dado.sensor.tipo }}: {{ dado.valor }} ({{ dado.data_hora|date:"d/m/Y H:i" }})
-          <div>
-              <a href="{% url 'sensores:atualizar_dados' dado.pk %}" class="btn btn-secondary btn-sm">Editar</a>
-              <a href="{% url 'sensores:deletar_dados' dado.pk %}" class="btn btn-danger btn-sm">Deletar</a>
-          </div>
-      </li>
-  {% endfor %}
-  </ul>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>📈 Dados dos Sensores</h1>
+    <a href="{% url 'sensores:criar_dados' %}" class="btn btn-primary">
+        <i class="fas fa-plus"></i> Adicionar Dados
+    </a>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Histórico de Dados Coletados</h5>
+            </div>
+            <div class="card-body">
+                {% if dados_list %}
+                    <div class="list-group list-group-flush">
+                        {% for dado in dados_list %}
+                            <div class="list-group-item d-flex justify-content-between align-items-center dados-card">
+                                <div>
+                                    <h6 class="mb-1">{{ dado.motor.nome }} - {{ dado.sensor.tipo }}</h6>
+                                    <p class="mb-1"><strong>Valor:</strong> {{ dado.valor }}</p>
+                                    <small class="text-muted">{{ dado.data_hora|date:"d/m/Y H:i:s" }}</small>
+                                </div>
+                                <div>
+                                    <a href="{% url 'sensores:atualizar_dados' dado.pk %}" class="btn btn-outline-primary btn-sm me-2">Editar</a>
+                                    <a href="{% url 'sensores:deletar_dados' dado.pk %}" class="btn btn-outline-danger btn-sm">Deletar</a>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-5">
+                        <h5 class="text-muted">Nenhum dado coletado</h5>
+                        <p class="text-muted">Clique em "Adicionar Dados" para começar</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}

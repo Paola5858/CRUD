@@ -1,11 +1,55 @@
 {% extends 'sensores/base.html' %}
 
+{% block title %}Deletar Sensor - MOTOSENSE{% endblock %}
+
 {% block content %}
-<h1>Confirmar Deleção</h1>
-<p>Você tem certeza que quer deletar o sensor "{{ object.tipo }}"?</p>
-<form method="post">
-    {% csrf_token %}
-    <button type="submit" class="btn btn-danger">Confirmar</button>
-    <a href="{% url 'sensores:sensor_list' %}" class="btn btn-secondary">Cancelar</a>
-</form>
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card border-danger">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-exclamation-triangle"></i> Confirmar Exclusão
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-warning">
+                    <strong>Atenção!</strong> Esta ação não pode ser desfeita.
+                </div>
+                
+                <p>Tem certeza que deseja deletar o sensor:</p>
+                <div class="bg-light p-3 rounded mb-3">
+                    <h6><strong>{{ object.tipo }}</strong></h6>
+                    <p class="mb-1">Precisão: {{ object.precisao }}</p>
+                    <small class="text-muted">Criado em: {{ object.criado_em|date:"d/m/Y H:i" }}</small>
+                </div>
+                
+                <form method="post" id="deleteForm">
+                    {% csrf_token %}
+                    <div class="d-flex gap-2 justify-content-end">
+                        <a href="{% url 'sensores:listar_sensor' %}" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-danger" id="deleteBtn">
+                            <span class="spinner-border spinner-border-sm d-none" id="loadingSpinner"></span>
+                            <i class="fas fa-trash" id="deleteIcon"></i> Sim, Deletar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('deleteForm').addEventListener('submit', function(e) {
+    const deleteBtn = document.getElementById('deleteBtn');
+    const loadingSpinner = document.getElementById('loadingSpinner');
+    const deleteIcon = document.getElementById('deleteIcon');
+    
+    // Loading state
+    deleteBtn.disabled = true;
+    loadingSpinner.classList.remove('d-none');
+    deleteIcon.classList.add('d-none');
+});
+</script>
 {% endblock %}
