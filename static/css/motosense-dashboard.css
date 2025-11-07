@@ -387,6 +387,38 @@ body {
     animation: rotate 2s linear infinite;
 }
 
+/* Chart error states */
+.chart-error {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 200px;
+    color: #ff6b00;
+    font-family: 'Teko', sans-serif;
+    text-align: center;
+    padding: 20px;
+}
+
+.error-icon {
+    font-size: 48px;
+    margin-bottom: 12px;
+    animation: pulse 2s infinite;
+}
+
+.error-message {
+    font-size: 18px;
+    font-weight: 700;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+}
+
+.error-details {
+    font-size: 14px;
+    color: #808080;
+    font-weight: 500;
+}
+
 /* Accessibility improvements */
 .sr-only {
     position: absolute;

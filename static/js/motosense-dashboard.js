@@ -25,7 +25,17 @@ const chartColors = {
 // ━━━ MAIN CHART (LINE) ━━━
 function initMainChart() {
     const ctx = document.getElementById('mainChart');
-    if (!ctx) return;
+    if (!ctx) {
+        console.warn('Canvas mainChart não encontrado');
+        return;
+    }
+
+    // Verificar se Chart.js está carregado
+    if (typeof Chart === 'undefined') {
+        console.error('Chart.js não foi carregado corretamente');
+        showChartError('mainChart', 'Chart.js não carregado');
+        return;
+    }
 
     // Usar dados do backend se disponíveis
     const backendData = window.DASHBOARD_BACKEND?.chart_data || {
@@ -34,6 +44,8 @@ function initMainChart() {
         pressao: [12, 15, 18, 24, 20, 25, 32, 28, 30, 35, 38, 40],
         velocidade: [10, 13, 16, 22, 18, 23, 30, 26, 28, 33, 36, 38]
     };
+
+    console.log('Dados do gráfico principal:', backendData);
 
     const data = {
         labels: backendData.labels,
@@ -120,13 +132,27 @@ function initMainChart() {
         }
     };
 
-    mainChartInstance = new Chart(ctx, config);
+    try {
+        mainChartInstance = new Chart(ctx, config);
+        console.log('Gráfico principal inicializado com sucesso');
+    } catch (error) {
+        console.error('Erro ao inicializar gráfico principal:', error);
+        showChartError('mainChart', 'Erro na inicialização');
+    }
 }
 
 // ━━━ DONUT CHART ━━━
 function initDonutChart() {
     const ctx = document.getElementById('donutChart');
-    if (!ctx) return;
+    if (!ctx) {
+        console.warn('Canvas donutChart não encontrado');
+        return;
+    }
+
+    if (typeof Chart === 'undefined') {
+        console.error('Chart.js não disponível para donut chart');
+        return;
+    }
 
     const data = {
         labels: ['Temperatura', 'Pressão', 'Velocidade'],
@@ -157,13 +183,27 @@ function initDonutChart() {
         }
     };
 
-    donutChartInstance = new Chart(ctx, config);
+    try {
+        donutChartInstance = new Chart(ctx, config);
+        console.log('Gráfico donut inicializado com sucesso');
+    } catch (error) {
+        console.error('Erro ao inicializar donut chart:', error);
+        showChartError('donutChart', 'Erro na inicialização');
+    }
 }
 
 // ━━━ BAR CHART ━━━
 function initBarChart() {
     const ctx = document.getElementById('barChart');
-    if (!ctx) return;
+    if (!ctx) {
+        console.warn('Canvas barChart não encontrado');
+        return;
+    }
+
+    if (typeof Chart === 'undefined') {
+        console.error('Chart.js não disponível para bar chart');
+        return;
+    }
 
     const data = {
         labels: ['SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SÁB', 'DOM'],
@@ -237,13 +277,27 @@ function initBarChart() {
         }
     };
 
-    barChartInstance = new Chart(ctx, config);
+    try {
+        barChartInstance = new Chart(ctx, config);
+        console.log('Gráfico de barras inicializado com sucesso');
+    } catch (error) {
+        console.error('Erro ao inicializar bar chart:', error);
+        showChartError('barChart', 'Erro na inicialização');
+    }
 }
 
 // ━━━ GAUGE CHART ━━━
 function initGaugeChart() {
     const ctx = document.getElementById('gaugeChart');
-    if (!ctx) return;
+    if (!ctx) {
+        console.warn('Canvas gaugeChart não encontrado');
+        return;
+    }
+
+    if (typeof Chart === 'undefined') {
+        console.error('Chart.js não disponível para gauge chart');
+        return;
+    }
 
     const data = {
         datasets: [{
@@ -273,7 +327,13 @@ function initGaugeChart() {
         }
     };
 
-    gaugeChartInstance = new Chart(ctx, config);
+    try {
+        gaugeChartInstance = new Chart(ctx, config);
+        console.log('Gráfico gauge inicializado com sucesso');
+    } catch (error) {
+        console.error('Erro ao inicializar gauge chart:', error);
+        showChartError('gaugeChart', 'Erro na inicialização');
+    }
 }
 
 // ━━━ REAL-TIME UPDATES ━━━
@@ -357,17 +417,54 @@ function updateMetrics() {
     });
 }
 
+// ━━━ ERROR HANDLING ━━━
+function showChartError(chartId, message) {
+    const canvas = document.getElementById(chartId);
+    if (canvas) {
+        const container = canvas.parentElement;
+        container.innerHTML = `
+            <div class="chart-error">
+                <div class="error-icon">⚠️</div>
+                <div class="error-message">Erro no gráfico</div>
+                <div class="error-details">${message}</div>
+            </div>
+        `;
+        container.style.cssText = 'display:flex;align-items:center;justify-content:center;height:200px;color:#ff6b00;text-align:center;';
+    }
+}
+
 // ━━━ INITIALIZATION ━━━
 document.addEventListener('DOMContentLoaded', function() {
     console.log('🏍️ MOTOSENSE Dashboard Initializing...');
     
-    // Initialize charts
+    // Verificar se dados do backend estão disponíveis
+    if (window.DASHBOARD_BACKEND) {
+        console.log('✅ Dados do backend carregados:', window.DASHBOARD_BACKEND);
+    } else {
+        console.warn('⚠️ Dados do backend não encontrados, usando fallback');
+        window.DASHBOARD_BACKEND = {
+            chart_data: {
+                labels: ['JAN', 'FEV', 'MAR', 'ABR', 'MAI', 'JUN', 'JUL', 'AGO', 'SET', 'OUT', 'NOV', 'DEZ'],
+                temperatura: [15, 18, 22, 28, 24, 30, 38, 32, 35, 40, 42, 45],
+                pressao: [12, 15, 18, 24, 20, 25, 32, 28, 30, 35, 38, 40],
+                velocidade: [10, 13, 16, 22, 18, 23, 30, 26, 28, 33, 36, 38]
+            },
+            metrics: {
+                total_motores: 12,
+                total_sensores: 24,
+                crescimento: 47.8
+            }
+        };
+    }
+    
+    // Initialize charts with delay to ensure DOM is ready
     setTimeout(() => {
+        console.log('Inicializando gráficos...');
         initMainChart();
         initDonutChart();
         initBarChart();
         initGaugeChart();
-    }, 100);
+    }, 300);
     
     // Update time immediately and then every second
     updateTime();
@@ -396,6 +493,17 @@ document.addEventListener('DOMContentLoaded', function() {
     }, 30000);
     
     console.log('🔥 MOTOSENSE Dashboard Ready!');
+    
+    // Verificar se todos os gráficos foram inicializados
+    setTimeout(() => {
+        const charts = [mainChartInstance, donutChartInstance, barChartInstance, gaugeChartInstance];
+        const initialized = charts.filter(chart => chart !== null).length;
+        console.log(`📊 Gráficos inicializados: ${initialized}/4`);
+        
+        if (initialized === 0) {
+            console.error('❌ Nenhum gráfico foi inicializado! Verificar Chart.js');
+        }
+    }, 1000);
 });
 
 // ━━━ EXPORT FOR GLOBAL ACCESS ━━━

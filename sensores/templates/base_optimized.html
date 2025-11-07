@@ -64,8 +64,9 @@
         }
     </script>
     
-    <!-- Chart.js local with fallback -->
-    <script src="{% static 'js/chart.min.js' %}?v={{ js_version|default:'1.0' }}" defer></script>
+    <!-- Chart.js local with error handling -->
+    <script src="{% static 'js/chart.min.js' %}?v={{ js_version|default:'1.0' }}" 
+            onerror="console.error('Erro ao carregar Chart.js local')" defer></script>
     
     {% block extra_js %}{% endblock %}
     
