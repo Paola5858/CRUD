@@ -31,6 +31,9 @@
                     <div class="brand-name">MOTOSENSE</div>
                     <div class="brand-tagline">SISTEMA DE CONTROLE</div>
                 </div>
+                <button class="sidebar-toggle" id="sidebarToggle">
+                    <span class="toggle-icon">⟨</span>
+                </button>
             </div>
             
             <!-- Navigation Menu -->
@@ -423,7 +426,8 @@
                 <button class="modal-close" id="modalClose">✕</button>
             </div>
             <div class="modal-body">
-                <form id="motorForm" class="motor-form">
+                <form id="motorForm" class="motor-form" method="POST" action="{% url 'sensores:criar_motor' %}">
+                    {% csrf_token %}
                     <div class="form-row">
                         <div class="form-group">
                             <label class="form-label">🏍️ NOME DO MOTOR</label>
@@ -470,6 +474,12 @@
             </div>
         </div>
     </div>
+    
+    <!-- Dados do Backend -->
+    <script>
+        // Dados vindos do Django
+        window.MOTORES_BACKEND = {{ motores_json|safe|default:'[]' }};
+    </script>
     
     <!-- JavaScript -->
     <script src="{% static 'js/motosense-crud.js' %}"></script>

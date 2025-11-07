@@ -2,92 +2,39 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}MOTOSENSE{% endblock %}</title>
     {% load static %}
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="{% static 'css/style.css' %}" rel="stylesheet">
-    <link href="{% static 'css/motosense-dashboard.css' %}" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    {% block extra_css %}{% endblock %}
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container">
-            <a class="navbar-brand" href="{% url 'dashboard:index' %}">
-                <span class="me-2">⚙️</span>
-                MOTOSENSE
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link{% if request.resolver_match.url_name == 'index' %} active{% endif %}" href="{% url 'dashboard:index' %}">
-                            <i class="fas fa-chart-bar me-1"></i> Dashboard
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link{% if 'motor' in request.resolver_match.url_name %} active{% endif %}" href="{% url 'sensores:listar_motor' %}">
-                            <i class="fas fa-car me-1"></i> Motores
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link{% if 'sensor' in request.resolver_match.url_name and 'sensormotor' not in request.resolver_match.url_name %} active{% endif %}" href="{% url 'sensores:listar_sensor' %}">
-                            <i class="fas fa-satellite-dish me-1"></i> Sensores
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link{% if 'dados' in request.resolver_match.url_name %} active{% endif %}" href="{% url 'sensores:listar_dados' %}">
-                            <i class="fas fa-chart-line me-1"></i> Dados
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link{% if 'sensormotor' in request.resolver_match.url_name %} active{% endif %}" href="{% url 'sensores:listar_sensormotor' %}">
-                            <i class="fas fa-link me-1"></i> Associações
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
-
-    <main class="container py-4">
-        {% block breadcrumb %}
-        <nav aria-label="breadcrumb" class="mb-4">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="{% url 'dashboard:index' %}"><i class="fas fa-home"></i> Início</a></li>
-                {% block breadcrumb_items %}{% endblock %}
-            </ol>
+    <header class="simple-header">
+        <h1>MOTOSENSE - Sistema de Controle</h1>
+        <nav class="simple-nav">
+            <a href="{% url 'sensores:listar_motor' %}" class="nav-link">Motores</a>
+            <a href="{% url 'sensores:listar_sensor' %}" class="nav-link">Sensores</a>
+            <a href="{% url 'sensores:listar_dados' %}" class="nav-link">Dados</a>
+            <a href="{% url 'dashboard:index' %}" class="nav-link">Dashboard</a>
         </nav>
-        {% endblock %}
-        
+    </header>
+
+    <main class="simple-main">
+        {% if messages %}
+            <div class="messages">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+            </div>
+        {% endif %}
+
         {% block content %}{% endblock %}
     </main>
 
-    <footer class="bg-dark text-light text-center py-3 mt-5">
-        <p class="mb-0">&copy; 2025 MOTOSENSE. Todos os direitos reservados.</p>
+    <footer class="simple-footer">
+        <p>&copy; 2025 MOTOSENSE. Todos os direitos reservados.</p>
     </footer>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="{% static 'js/main.js' %}"></script>
-    
-    {% if messages %}
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        {% for message in messages %}
-        const alertDiv = document.createElement('div');
-        alertDiv.className = 'alert alert-{{ message.tags }} alert-dismissible fade show position-fixed';
-        alertDiv.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
-        alertDiv.innerHTML = `
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        `;
-        document.body.appendChild(alertDiv);
-        setTimeout(() => alertDiv.remove(), 5000);
-        {% endfor %}
-    });
-    </script>
-    {% endif %}
+    {% block extra_js %}{% endblock %}
 </body>
 </html>

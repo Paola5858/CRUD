@@ -5,7 +5,7 @@ class BaseService:
         self.repository = repository
 
     def list_all(self):
-        return self.repository.get_all()
+        return self.repository.get_all_optimized()
 
     def get_by_id(self, id):
         return self.repository.get_by_id(id)
@@ -30,6 +30,10 @@ class SensorService(BaseService):
 class DadosSensorService(BaseService):
     def __init__(self):
         super().__init__(DadosSensorRepository())
+    
+    def get_recent_data(self, limit=1000):
+        """Buscar dados recentes otimizado"""
+        return self.repository.get_recent_data(limit)
 
 class SensorMotorService(BaseService):
     def __init__(self):

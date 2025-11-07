@@ -191,7 +191,7 @@ const SAMPLE_MOTORS = [
 ];
 
 // ━━━ GLOBAL STATE ━━━
-let currentMotors = [...SAMPLE_MOTORS];
+let currentMotors = window.MOTORES_BACKEND && window.MOTORES_BACKEND.length > 0 ? [...window.MOTORES_BACKEND] : [...SAMPLE_MOTORS];
 let selectedMotors = [];
 let sortColumn = 'name';
 let sortDirection = 'asc';
@@ -888,6 +888,26 @@ document.addEventListener('DOMContentLoaded', function() {
             showNewMotorModal();
         }
     });
+    
+    // Sidebar toggle functionality
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    const sidebar = document.querySelector('.sidebar');
+    
+    if (sidebarToggle && sidebar) {
+        sidebarToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('collapsed');
+            
+            // Save state to localStorage
+            const isCollapsed = sidebar.classList.contains('collapsed');
+            localStorage.setItem('sidebarCollapsed', isCollapsed);
+        });
+        
+        // Restore sidebar state from localStorage
+        const savedState = localStorage.getItem('sidebarCollapsed');
+        if (savedState === 'true') {
+            sidebar.classList.add('collapsed');
+        }
+    }
     
     console.log('🔥 MOTOSENSE CRUD Ready!');
 });

@@ -17,7 +17,32 @@ class CrudStrategy(ABC):
 class ListStrategy(CrudStrategy):
     def handle_request(self, request, *args, **kwargs):
         objects = self.service.list_all()
-        return render(request, self.template_name, {'objects': objects})
+        
+        # Para motores, adicionar dados JSON para JavaScript
+        context = {'objects': objects}
+        if 'motor' in self.template_name:
+            import json
+            import random
+            motores_data = []
+            for i, motor in enumerate(objects):
+                motores_data.append({
+                    'id': f'M-{str(i+1).zfill(3)}',
+                    'name': motor.nome,
+                    'serial': f'{motor.nome[:3].upper()}-2024-{str(i+1).zfill(2)}-X',
+                    'type': getattr(motor, 'tipo', 'INDUSTRIAL'),
+                    'power': int(motor.potencia) if motor.potencia else random.randint(1000, 3000),
+                    'temp': random.randint(70, 95),
+                    'rpm': random.randint(2000, 4500),
+                    'status': 'ONLINE' if i % 4 != 0 else 'OFFLINE',
+                    'lastSeen': f'Há {random.randint(1, 60)} min',
+                    'created': '01/11/2025 08:30',
+                    'description': getattr(motor, 'descricao', 'Motor do sistema'),
+                    'selected': False,
+                    'expanded': False
+                })
+            context['motores_json'] = json.dumps(motores_data)
+        
+        return render(request, self.template_name, context)
 
 class CreateStrategy(CrudStrategy):
     def handle_request(self, request, *args, **kwargs):

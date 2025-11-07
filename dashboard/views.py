@@ -1,8 +1,11 @@
 from django.shortcuts import render
 from django.http import JsonResponse
-from django.db.models import Count, Avg, Max, Min
+from django.db.models import Count, Avg, Max, Min, Q
+from django.db.models.functions import TruncMonth
 from django.utils import timezone
-from datetime import timedelta
+from django.views.decorators.cache import cache_page
+from django.views.decorators.vary import vary_on_headers
+from datetime import datetime, timedelta
 from sensores.models import Motor, Sensor, DadosSensor
 import random
 
@@ -12,10 +15,10 @@ def dashboard_view(request):
     
     # Métricas básicas para o template
     context = {
-        'total_motores': Motor.objects.count(),
-        'total_sensores': Sensor.objects.count(),
-        'total_leituras': DadosSensor.objects.count(),
-        'motores_online': Motor.objects.count() - random.randint(0, 4),  # Simula alguns offline
+        'total_motores': Motor.objects.count() or 12,
+        'total_sensores': Sensor.objects.count() or 24,
+        'total_leituras': DadosSensor.objects.count() or 15847,
+        'motores_online': (Motor.objects.count() or 12) - random.randint(0, 4),
         'alertas_criticos': random.randint(1, 5),
         'temperatura_media': round(random.uniform(75, 85), 1),
         'rpm_medio': random.randint(3200, 3800),
@@ -26,13 +29,36 @@ def dashboard_view(request):
     return render(request, 'dashboard/index.html', context)
 
 
+@cache_page(60 * 5)  # Cache por 5 minutos
+@vary_on_headers('User-Agent')
 def dashboard_metrics_api(request):
     """API principal para métricas do dashboard"""
     
-    # Dados para gráfico principal (últimos 12 meses)
-    chart_data_temp = [15, 18, 22, 28, 24, 30, 38, 32, 35, 40, 42, 45]
-    chart_data_press = [12, 15, 18, 24, 20, 25, 32, 28, 30, 35, 38, 40]
-    chart_data_vel = [10, 13, 16, 22, 18, 23, 30, 26, 28, 33, 36, 38]
+    # Buscar dados reais dos últimos 12 meses
+    hoje = timezone.now()
+    doze_meses_atras = hoje - timedelta(days=365)
+    
+    # Agregar leituras por mês
+    leituras_mensais = DadosSensor.objects.filter(
+        data_hora__gte=doze_meses_atras
+    ).annotate(
+        mes=TruncMonth('data_hora')
+    ).values('mes').annotate(
+        temp_media=Avg('valor', filter=Q(sensor__tipo='TEMPERATURA')),
+        press_media=Avg('valor', filter=Q(sensor__tipo='PRESSAO')),
+        vel_media=Avg('valor', filter=Q(sensor__tipo='VELOCIDADE'))
+    ).order_by('mes')
+    
+    # Converter para listas
+    chart_data_temp = [float(r['temp_media'] or 0) for r in leituras_mensais]
+    chart_data_press = [float(r['press_media'] or 0) for r in leituras_mensais]
+    chart_data_vel = [float(r['vel_media'] or 0) for r in leituras_mensais]
+    
+    # Se não há dados suficientes, usar simulados como fallback
+    if len(chart_data_temp) < 12:
+        chart_data_temp = [15, 18, 22, 28, 24, 30, 38, 32, 35, 40, 42, 45]
+        chart_data_press = [12, 15, 18, 24, 20, 25, 32, 28, 30, 35, 38, 40]
+        chart_data_vel = [10, 13, 16, 22, 18, 23, 30, 26, 28, 33, 36, 38]
     
     labels = ['JAN', 'FEV', 'MAR', 'ABR', 'MAI', 'JUN', 'JUL', 'AGO', 'SET', 'OUT', 'NOV', 'DEZ']
     
@@ -81,6 +107,7 @@ def dashboard_metrics_api(request):
     })
 
 
+@cache_page(60 * 2)  # Cache por 2 minutos
 def motor_status_api(request):
     """Status dos motores em tempo real"""
     
@@ -94,8 +121,8 @@ def motor_status_api(request):
         {'nome': 'Motor F6', 'potencia': 1400, 'temperatura': 81, 'online': True}
     ]
     
-    # Se existem motores reais no banco, usar alguns dados reais
-    motores_db = Motor.objects.all()[:6]
+    # Se existem motores reais no banco, usar alguns dados reais (otimizado)
+    motores_db = Motor.objects.only('nome', 'potencia')[:6]
     if motores_db:
         for i, motor in enumerate(motores_db):
             if i < len(motor_status):
@@ -109,6 +136,7 @@ def motor_status_api(request):
     })
 
 
+@cache_page(60 * 1)  # Cache por 1 minuto
 def alerts_api(request):
     """API para alertas críticos"""
     

@@ -43,8 +43,8 @@
 }
 
 html, body {
-    width: 1920px;
-    height: 1080px;
+    width: 100%;
+    height: 100vh;
     overflow: hidden;
     font-family: var(--font-ui);
     background: var(--deep-black);
@@ -70,8 +70,8 @@ html, body {
 /* ━━━ MAIN CONTAINER ━━━ */
 .dashboard-container {
     display: flex;
-    width: 1920px;
-    height: 1080px;
+    width: 100%;
+    height: 100vh;
     position: relative;
     z-index: 1;
 }
@@ -82,7 +82,7 @@ html, body {
 
 .sidebar {
     width: 280px;
-    height: 1080px;
+    height: 100vh;
     background: var(--deep-black);
     background-image: 
         repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(26,26,26,0.03) 2px, rgba(26,26,26,0.03) 4px);
@@ -93,6 +93,47 @@ html, body {
     display: flex;
     flex-direction: column;
     position: relative;
+    transition: width 300ms ease;
+}
+
+.sidebar.collapsed {
+    width: 80px;
+}
+
+.sidebar.collapsed .nav-text,
+.sidebar.collapsed .brand-text,
+.sidebar.collapsed .stat-label,
+.sidebar.collapsed .sidebar-stats,
+.sidebar.collapsed .user-info {
+    display: none;
+}
+
+.sidebar-toggle {
+    position: absolute;
+    top: 50%;
+    right: -15px;
+    width: 30px;
+    height: 30px;
+    background: var(--electric-orange);
+    border: none;
+    border-radius: 50%;
+    color: #000000;
+    font-size: 16px;
+    cursor: pointer;
+    z-index: 100;
+    transition: all 200ms ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.sidebar-toggle:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 16px rgba(255, 107, 0, 0.5);
+}
+
+.sidebar.collapsed .sidebar-toggle .toggle-icon {
+    transform: rotate(180deg);
 }
 
 .logo-section {
@@ -104,6 +145,7 @@ html, body {
     display: flex;
     align-items: center;
     gap: 16px;
+    position: relative;
 }
 
 .logo-container {
@@ -378,7 +420,7 @@ html, body {
 
 .main-content {
     flex: 1;
-    height: 1080px;
+    height: 100vh;
     background: var(--deep-black);
     display: flex;
     flex-direction: column;
@@ -852,7 +894,9 @@ html, body {
 .table-container {
     flex: 1;
     padding: 0 48px 48px 48px;
-    overflow: hidden;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
 }
 
 .table-card {
@@ -868,6 +912,7 @@ html, body {
     height: 100%;
     display: flex;
     flex-direction: column;
+    min-width: 1400px;
 }
 
 /* ━━━ BULK ACTIONS BAR ━━━ */
@@ -1468,7 +1513,169 @@ html, body {
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   RESPONSIVE & UTILITY CLASSES
+   RESPONSIVE BREAKPOINTS
+   ═══════════════════════════════════════════════════════════════ */
+
+@media (max-width: 1600px) {
+    .sidebar {
+        width: 240px;
+    }
+    
+    .sidebar.collapsed {
+        width: 70px;
+    }
+    
+    .page-header {
+        padding: 24px 32px;
+    }
+    
+    .advanced-toolbar {
+        padding: 20px 32px;
+    }
+    
+    .table-container {
+        padding: 0 32px 32px 32px;
+    }
+}
+
+@media (max-width: 1400px) {
+    .sidebar {
+        width: 200px;
+    }
+    
+    .page-title {
+        font-size: 36px;
+    }
+    
+    .super-search {
+        width: 350px;
+    }
+    
+    .table-header {
+        grid-template-columns: 50px 80px 200px 120px 110px 100px 100px 130px 150px 150px;
+    }
+}
+
+@media (max-width: 1200px) {
+    .dashboard-container {
+        flex-direction: column;
+    }
+    
+    .sidebar {
+        width: 100%;
+        height: auto;
+        flex-direction: row;
+        justify-content: space-between;
+        padding: 16px;
+    }
+    
+    .sidebar.collapsed {
+        width: 100%;
+    }
+    
+    .nav-menu {
+        display: flex;
+        gap: 16px;
+        padding: 0;
+    }
+    
+    .nav-item {
+        margin: 0;
+        width: auto;
+        height: 40px;
+        padding: 8px 16px;
+    }
+    
+    .sidebar-stats,
+    .sidebar-footer {
+        display: none;
+    }
+    
+    .main-content {
+        height: calc(100vh - 100px);
+    }
+    
+    .page-header {
+        height: auto;
+        padding: 20px;
+    }
+    
+    .header-tier-2 {
+        flex-direction: column;
+        gap: 16px;
+        align-items: flex-start;
+    }
+    
+    .action-buttons {
+        width: 100%;
+        justify-content: space-between;
+    }
+    
+    .advanced-toolbar {
+        height: auto;
+        flex-direction: column;
+        gap: 16px;
+        padding: 20px;
+    }
+    
+    .toolbar-left,
+    .toolbar-center,
+    .toolbar-right {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .super-search {
+        width: 100%;
+        max-width: 400px;
+    }
+}
+
+@media (max-width: 768px) {
+    .page-title {
+        font-size: 28px;
+    }
+    
+    .btn-primary.mega-cta {
+        width: 150px;
+        height: 44px;
+        font-size: 14px;
+    }
+    
+    .btn-secondary {
+        width: 120px;
+        height: 44px;
+        font-size: 13px;
+    }
+    
+    .table-container {
+        padding: 0 16px 16px 16px;
+    }
+    
+    .table-header {
+        padding: 0 20px;
+        grid-template-columns: 40px 60px 150px 100px 90px 80px 80px 100px 120px 120px;
+        font-size: 10px;
+    }
+    
+    .table-footer {
+        padding: 0 20px;
+        flex-direction: column;
+        gap: 16px;
+        height: auto;
+        padding: 20px;
+    }
+    
+    .footer-left,
+    .footer-center,
+    .footer-right {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   UTILITY CLASSES
    ═══════════════════════════════════════════════════════════════ */
 
 .text-orange { color: var(--electric-orange); }
@@ -1484,6 +1691,43 @@ html, body {
 
 .uppercase { text-transform: uppercase; }
 .bold { font-weight: 700; }
+
+/* ═══════════════════════════════════════════════════════════════
+   DASHBOARD GRID RESPONSIVO
+   ═══════════════════════════════════════════════════════════════ */
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 24px;
+    padding: 24px;
+}
+
+@media (min-width: 1920px) {
+    .dashboard-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+@media (max-width: 1600px) {
+    .dashboard-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 1200px) {
+    .dashboard-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+        padding: 16px;
+    }
+}
 
 /* ═══════════════════════════════════════════════════════════════
    END OF MOTOSENSE CRUD CSS
