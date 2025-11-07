@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MOTOSENSE - Painel de Controle</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Teko:wght@400;500;600;700;800&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Chart.js Local -->
+    {% load static %}
+    <script src="{% static 'js/chart.min.js' %}"></script>
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="{% static 'css/motosense-dashboard.css' %}">
+</head>
+<body>
+    <!-- Hex Pattern Overlay -->
+    <div class="hex-pattern-overlay"></div>
+    
+    <!-- Sidebar Toggle Button -->
+    <button class="sidebar-toggle" id="sidebarToggle">
+        ☰
+    </button>
+    
+    <!-- Sidebar Overlay -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    
+    <!-- Main Container -->
+    <div class="dashboard-container">
+        
+        <!-- LEFT SIDEBAR -->
+        <aside class="sidebar">
+            <!-- Logo Section -->
+            <div class="logo-section">
+                <div class="logo-container">
+                    <div class="skull-icon">💀</div>
+                </div>
+                <div class="brand-text">
+                    <div class="brand-name">MOTOSENSE</div>
+                    <div class="brand-tagline">SISTEMA DE CONTROLE</div>
+                </div>
+            </div>
+            
+            <!-- Navigation Menu -->
+            <nav class="nav-menu">
+                <div class="nav-section-label">NAVEGAÇÃO</div>
+                
+                <a href="#" class="nav-item active">
+                    <div class="nav-icon-container">
+                        <span class="nav-icon">📊</span>
+                    </div>
+                    <span class="nav-text">Dashboard</span>
+                    <div class="active-indicator"></div>
+                    <div class="speed-lines">
+                        <div class="speed-line"></div>
+                        <div class="speed-line"></div>
+                        <div class="speed-line"></div>
+                    </div>
+                </a>
+                
+                <a href="{% url 'sensores:listar_motor' %}" class="nav-item">
+                    <div class="nav-icon-container">
+                        <span class="nav-icon">🏍️</span>
+                    </div>
+                    <span class="nav-text">Motores</span>
+                </a>
+                
+                <a href="{% url 'sensores:listar_sensor' %}" class="nav-item">
+                    <div class="nav-icon-container">
+                        <span class="nav-icon">📡</span>
+                    </div>
+                    <span class="nav-text">Sensores</span>
+                </a>
+                
+                <a href="{% url 'sensores:listar_dados' %}" class="nav-item">
+                    <div class="nav-icon-container">
+                        <span class="nav-icon">📊</span>
+                    </div>
+                    <span class="nav-text">Dados</span>
+                </a>
+                
+                <a href="#" class="nav-item">
+                    <div class="nav-icon-container">
+                        <span class="nav-icon">📋</span>
+                    </div>
+                    <span class="nav-text">Relatórios</span>
+                </a>
+                
+                <a href="#" class="nav-item">
+                    <div class="nav-icon-container">
+                        <span class="nav-icon">⚙️</span>
+                    </div>
+                    <span class="nav-text">Configurações</span>
+                </a>
+            </nav>
+            
+            <!-- Sidebar Stats Panel -->
+            <div class="sidebar-stats">
+                <div class="quick-stat">
+                    <span class="stat-icon">🔥</span>
+                    <div class="stat-info">
+                        <div class="stat-label">MOTORES ATIVOS</div>
+                        <div class="stat-value">8/12</div>
+                    </div>
+                </div>
+                <div class="quick-stat">
+                    <span class="stat-icon">⚡</span>
+                    <div class="stat-info">
+                        <div class="stat-label">POTÊNCIA TOTAL</div>
+                        <div class="stat-value">24.2 kW</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Sidebar Footer -->
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <div class="user-avatar">PM</div>
+                    <div class="user-info">
+                        <div class="user-name">Paola Machado</div>
+                        <div class="user-role">ADMINISTRADOR</div>
+                    </div>
+                    <button class="logout-btn">🚪</button>
+                </div>
+            </div>
+        </aside>
+        
+        <!-- MAIN CONTENT -->
+        <main class="main-content">
+            
+            <!-- TOP HEADER BAR -->
+            <header class="top-header">
+                <!-- Left Section -->
+                <div class="header-left">
+                    <div class="breadcrumb">
+                        <span class="breadcrumb-item">🏠 INÍCIO</span>
+                        <span class="breadcrumb-separator">›</span>
+                        <span class="breadcrumb-item">📊 DASHBOARD</span>
+                        <span class="breadcrumb-separator">›</span>
+                        <span class="breadcrumb-item current">⚡ VISÃO GERAL</span>
+                    </div>
+                    <h1 class="page-title">PAINEL DE CONTROLE</h1>
+                    <div class="live-indicator">
+                        <div class="pulse-dot"></div>
+                        <span class="live-text">SISTEMA OPERACIONAL • ATUALIZAÇÃO EM TEMPO REAL</span>
+                    </div>
+                </div>
+                
+                <!-- Center Section -->
+                <div class="header-center">
+                    <div class="metric-card">
+                        <div class="metric-icon">🌡️</div>
+                        <div class="metric-content">
+                            <div class="metric-value">78°C</div>
+                            <div class="metric-label">TEMP MÉDIA</div>
+                            <div class="metric-trend up">↗ +2°C</div>
+                        </div>
+                    </div>
+                    
+                    <div class="metric-card">
+                        <div class="metric-icon rotating">🔄</div>
+                        <div class="metric-content">
+                            <div class="metric-value cyan">3.450</div>
+                            <div class="metric-label">RPM MÉDIO</div>
+                            <div class="metric-trend up cyan">↗ +120</div>
+                        </div>
+                    </div>
+                    
+                    <div class="metric-card">
+                        <div class="metric-icon pulsing-red">⚠️</div>
+                        <div class="metric-content">
+                            <div class="metric-value red">03</div>
+                            <div class="metric-label">ALERTAS</div>
+                            <div class="metric-trend critical">! AÇÃO NECESSÁRIA</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Right Section -->
+                <div class="header-right">
+                    <div class="time-display">
+                        <div class="current-time">16:05</div>
+                        <div class="current-date">06/NOV/2025</div>
+                    </div>
+                    
+                    <button class="header-btn">
+                        <span class="btn-icon">🔔</span>
+                        <div class="notification-badge"></div>
+                    </button>
+                    
+                    <button class="header-btn">
+                        <span class="btn-icon">⚙️</span>
+                    </button>
+                    
+                    <div class="period-toggle">
+                        <button class="period-btn">DIA</button>
+                        <button class="period-btn active">MÊS</button>
+                        <button class="period-btn">ANO</button>
+                    </div>
+                </div>
+            </header>
+            
+            <!-- DASHBOARD CONTENT GRID -->
+            <div class="dashboard-grid">
+                
+                <!-- MAIN CHART -->
+                <div class="card main-chart">
+                    <div class="card-header">
+                        <div class="card-title-section">
+                            <h2 class="card-title">EVOLUÇÃO DE DESEMPENHO</h2>
+                            <p class="card-subtitle">Leituras dos sensores ao longo do tempo</p>
+                        </div>
+                        <div class="growth-highlight">
+                            <div class="growth-icon">🔥</div>
+                            <div class="growth-content">
+                                <div class="growth-value">+47.8%</div>
+                                <div class="growth-label">CRESCIMENTO</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="mainChart"></canvas>
+                    </div>
+                    <div class="chart-legend">
+                        <div class="legend-item">
+                            <div class="legend-dot orange"></div>
+                            <span>Temperatura</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-dot cyan"></div>
+                            <span>Pressão</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-dot amber"></div>
+                            <span>Velocidade</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- METRIC CARDS -->
+                <div class="card metric-card-container">
+                    <div class="metric-icon-bg">📈</div>
+                    <div class="metric-value-large">15.847</div>
+                    <div class="metric-label-large">LEITURAS TOTAIS</div>
+                    <div class="metric-trend-badge positive">+1.2K HOJE</div>
+                </div>
+                
+                <div class="card metric-card-container">
+                    <div class="metric-icon-bg amber">⚡</div>
+                    <div class="metric-value-large amber">1.847 W</div>
+                    <div class="metric-label-large">POTÊNCIA MÉDIA</div>
+                    <div class="metric-trend-badge positive">+124W</div>
+                </div>
+                
+                <div class="card metric-card-container">
+                    <div class="metric-icon-bg green">⏱️</div>
+                    <div class="metric-value-large green">99.2%</div>
+                    <div class="metric-label-large">UPTIME DO SISTEMA</div>
+                    <div class="metric-trend-badge positive green">+0.3% ↑</div>
+                </div>
+                
+                <!-- DONUT CHART -->
+                <div class="card donut-chart">
+                    <div class="card-header">
+                        <h3 class="card-title">DISTRIBUIÇÃO POR TIPO</h3>
+                        <p class="card-subtitle">Sensores ativos por categoria</p>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="donutChart"></canvas>
+                    </div>
+                </div>
+                
+                <!-- BAR CHART -->
+                <div class="card bar-chart">
+                    <div class="card-header">
+                        <h3 class="card-title">DESEMPENHO SEMANAL</h3>
+                        <div class="week-total">TOTAL SEMANA: 124K</div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="barChart"></canvas>
+                    </div>
+                </div>
+                
+                <!-- GAUGE CHART -->
+                <div class="card gauge-card">
+                    <div class="card-header">
+                        <h3 class="card-title">SAÚDE DO SISTEMA</h3>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="gaugeChart"></canvas>
+                        <div class="gauge-center">
+                            <div class="gauge-value">92%</div>
+                            <div class="gauge-label">SAÚDE</div>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+        </main>
+    </div>
+    
+    <!-- Dados do Backend -->
+    <script>
+        window.DASHBOARD_BACKEND = {{ dashboard_json|safe|default:'{}' }};
+    </script>
+    
+    <!-- JavaScript -->
+    <script src="{% static 'js/motosense-dashboard.js' %}"></script>
+    
+    <!-- Sidebar Toggle Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebarToggle = document.getElementById('sidebarToggle');
+            const sidebar = document.querySelector('.sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            
+            function toggleSidebar() {
+                sidebar.classList.toggle('open');
+                overlay.classList.toggle('active');
+            }
+            
+            function closeSidebar() {
+                sidebar.classList.remove('open');
+                overlay.classList.remove('active');
+            }
+            
+            if (sidebarToggle) {
+                sidebarToggle.addEventListener('click', toggleSidebar);
+            }
+            
+            if (overlay) {
+                overlay.addEventListener('click', closeSidebar);
+            }
+            
+            window.addEventListener('resize', function() {
+                if (window.innerWidth > 1024) {
+                    closeSidebar();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
