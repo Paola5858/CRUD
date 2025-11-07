@@ -1,113 +1,485 @@
-{% load static %}
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Sensores</title>
+    <title>MOTOSENSE - Painel de Controle</title>
     
-    <!-- CSS -->
-    <link rel="stylesheet" href="{% static 'dashboard/css/style.css' %}">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Teko:wght@400;500;600;700;800&family=Barlow:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- CSS -->
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'dashboard/css/motosense.css' %}">
 </head>
 <body>
+    <!-- Hex Pattern Overlay -->
+    <div class="hex-pattern-overlay"></div>
+    
+    <!-- Main Container -->
     <div class="dashboard-container">
-        <!-- Sidebar -->
+        
+        <!-- LEFT SIDEBAR -->
         <aside class="sidebar">
-            <div class="logo">
-                <span class="icon">⚙️</span>
-                <span class="text">MOTOSENSE</span>
+            <!-- Logo Section -->
+            <div class="logo-section">
+                <div class="logo-container">
+                    <div class="skull-icon">💀</div>
+                </div>
+                <div class="brand-text">
+                    <div class="brand-name">MOTOSENSE</div>
+                    <div class="brand-tagline">SISTEMA DE CONTROLE</div>
+                </div>
             </div>
             
+            <!-- Navigation Menu -->
             <nav class="nav-menu">
+                <div class="nav-section-label">NAVEGAÇÃO</div>
+                
                 <a href="#" class="nav-item active">
-                    <span class="icon">📊</span>
-                    <span class="text">Dashboard</span>
+                    <div class="nav-icon-container">
+                        <span class="nav-icon">📊</span>
+                    </div>
+                    <span class="nav-text">Dashboard</span>
+                    <div class="active-indicator"></div>
+                    <div class="speed-lines">
+                        <div class="speed-line"></div>
+                        <div class="speed-line"></div>
+                        <div class="speed-line"></div>
+                    </div>
                 </a>
+                
                 <a href="{% url 'sensores:listar_motor' %}" class="nav-item">
-                    <span class="icon">🏎️</span>
-                    <span class="text">Motores</span>
+                    <div class="nav-icon-container">
+                        <span class="nav-icon">🏍️</span>
+                    </div>
+                    <span class="nav-text">Motores</span>
                 </a>
+                
                 <a href="{% url 'sensores:listar_sensor' %}" class="nav-item">
-                    <span class="icon">📡</span>
-                    <span class="text">Sensores</span>
+                    <div class="nav-icon-container">
+                        <span class="nav-icon">📡</span>
+                    </div>
+                    <span class="nav-text">Sensores</span>
                 </a>
+                
                 <a href="{% url 'sensores:listar_dados' %}" class="nav-item">
-                    <span class="icon">📈</span>
-                    <span class="text">Dados</span>
+                    <div class="nav-icon-container">
+                        <span class="nav-icon">📊</span>
+                    </div>
+                    <span class="nav-text">Dados</span>
                 </a>
+                
                 <a href="#" class="nav-item">
-                    <span class="icon">📋</span>
-                    <span class="text">Relatórios</span>
+                    <div class="nav-icon-container">
+                        <span class="nav-icon">📋</span>
+                    </div>
+                    <span class="nav-text">Relatórios</span>
                 </a>
+                
                 <a href="#" class="nav-item">
-                    <span class="icon">⚙️</span>
-                    <span class="text">Configurações</span>
+                    <div class="nav-icon-container">
+                        <span class="nav-icon">⚙️</span>
+                    </div>
+                    <span class="nav-text">Configurações</span>
                 </a>
             </nav>
+            
+            <!-- Sidebar Stats Panel -->
+            <div class="sidebar-stats">
+                <div class="quick-stat">
+                    <span class="stat-icon">🔥</span>
+                    <div class="stat-info">
+                        <div class="stat-label">MOTORES ATIVOS</div>
+                        <div class="stat-value">8/12</div>
+                    </div>
+                </div>
+                <div class="quick-stat">
+                    <span class="stat-icon">⚡</span>
+                    <div class="stat-info">
+                        <div class="stat-label">POTÊNCIA TOTAL</div>
+                        <div class="stat-value">24.2 kW</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Sidebar Footer -->
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <div class="user-avatar">PM</div>
+                    <div class="user-info">
+                        <div class="user-name">Paola Machado</div>
+                        <div class="user-role">ADMINISTRADOR</div>
+                    </div>
+                    <button class="logout-btn">🚪</button>
+                </div>
+            </div>
         </aside>
         
-        <!-- Conteúdo Principal -->
+        <!-- MAIN CONTENT -->
         <main class="main-content">
-            <!-- Header com Filtros -->
-            <header class="dashboard-header">
-                <div class="title-section">
-                    <h1>Visão Geral - Sensores</h1>
-                    <p class="subtitle">Monitoramento em tempo real</p>
+            
+            <!-- TOP HEADER BAR -->
+            <header class="top-header">
+                <!-- Left Section -->
+                <div class="header-left">
+                    <div class="breadcrumb">
+                        <span class="breadcrumb-item">🏠 INÍCIO</span>
+                        <span class="breadcrumb-separator">›</span>
+                        <span class="breadcrumb-item">📊 DASHBOARD</span>
+                        <span class="breadcrumb-separator">›</span>
+                        <span class="breadcrumb-item current">⚡ VISÃO GERAL</span>
+                    </div>
+                    <h1 class="page-title">PAINEL DE CONTROLE</h1>
+                    <div class="live-indicator">
+                        <div class="pulse-dot"></div>
+                        <span class="live-text">SISTEMA OPERACIONAL • ATUALIZAÇÃO EM TEMPO REAL</span>
+                    </div>
                 </div>
                 
-                <div class="filters">
-                    <select id="filter-period" class="filter-select">
-                        <option value="monthly">Mensal</option>
-                        <option value="weekly">Semanal</option>
-                        <option value="daily">Diário</option>
-                    </select>
+                <!-- Center Section -->
+                <div class="header-center">
+                    <div class="metric-card">
+                        <div class="metric-icon">🌡️</div>
+                        <div class="metric-content">
+                            <div class="metric-value">78°C</div>
+                            <div class="metric-label">TEMP MÉDIA</div>
+                            <div class="metric-trend up">↗ +2°C</div>
+                        </div>
+                    </div>
                     
-                    <select id="filter-year" class="filter-select">
-                        <option value="2025">2025</option>
-                        <option value="2024">2024</option>
-                    </select>
+                    <div class="metric-card">
+                        <div class="metric-icon rotating">🔄</div>
+                        <div class="metric-content">
+                            <div class="metric-value cyan">3.450</div>
+                            <div class="metric-label">RPM MÉDIO</div>
+                            <div class="metric-trend up cyan">↗ +120</div>
+                        </div>
+                    </div>
+                    
+                    <div class="metric-card">
+                        <div class="metric-icon pulsing-red">⚠️</div>
+                        <div class="metric-content">
+                            <div class="metric-value red">03</div>
+                            <div class="metric-label">ALERTAS</div>
+                            <div class="metric-trend critical">! AÇÃO NECESSÁRIA</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Right Section -->
+                <div class="header-right">
+                    <div class="time-display">
+                        <div class="current-time">16:05</div>
+                        <div class="current-date">06/NOV/2025</div>
+                    </div>
+                    
+                    <button class="header-btn">
+                        <span class="btn-icon">🔔</span>
+                        <div class="notification-badge"></div>
+                    </button>
+                    
+                    <button class="header-btn">
+                        <span class="btn-icon">⚙️</span>
+                    </button>
+                    
+                    <div class="period-toggle">
+                        <button class="period-btn">DIA</button>
+                        <button class="period-btn active">MÊS</button>
+                        <button class="period-btn">ANO</button>
+                    </div>
                 </div>
             </header>
             
-            <!-- Grid de Métricas -->
-            <div class="metrics-grid">
-                <!-- Gráfico Principal -->
-                <section class="chart-main-container">
-                    <div class="chart-header">
-                        <div class="metric-highlight">
-                            <div class="metric-value" id="growth-percentage">+47.8%</div>
-                            <div class="metric-label">Crescimento mensal</div>
-                            <div class="metric-subtext" id="total-readings">15.847 leituras</div>
+            <!-- DASHBOARD CONTENT GRID -->
+            <div class="dashboard-grid">
+                
+                <!-- MAIN CHART - Evolution Over Time -->
+                <div class="card main-chart">
+                    <div class="card-header">
+                        <div class="card-title-section">
+                            <h2 class="card-title">EVOLUÇÃO DE DESEMPENHO</h2>
+                            <p class="card-subtitle">Leituras dos sensores ao longo do tempo</p>
+                        </div>
+                        <div class="growth-highlight">
+                            <div class="growth-icon">🔥</div>
+                            <div class="growth-content">
+                                <div class="growth-value">+47.8%</div>
+                                <div class="growth-label">CRESCIMENTO</div>
+                            </div>
                         </div>
                     </div>
-                    <canvas id="chart-main" class="chart-canvas"></canvas>
-                </section>
-                
-                <!-- Gráfico de Rosca -->
-                <section class="chart-donut-container">
-                    <h3>Distribuição Sensores</h3>
-                    <canvas id="chart-donut" class="chart-canvas"></canvas>
-                </section>
-                
-                <!-- Painel de Status -->
-                <section class="status-panel">
-                    <div class="panel-header">
-                        <h3>Motores</h3>
-                        <span class="status-badge online" id="online-count">8 online</span>
+                    <div class="chart-container">
+                        <canvas id="mainChart"></canvas>
+                        <div class="peak-annotation">
+                            <div class="peak-icon">🏆</div>
+                            <div class="peak-value">38</div>
+                            <div class="peak-label">PICO DO MÊS</div>
+                        </div>
                     </div>
-                    
-                    <div class="status-list" id="motor-status-list">
-                        <!-- Conteúdo carregado via JS -->
+                    <div class="chart-legend">
+                        <div class="legend-item">
+                            <div class="legend-dot orange"></div>
+                            <span>Temperatura</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-dot cyan"></div>
+                            <span>Pressão</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-dot amber"></div>
+                            <span>Velocidade</span>
+                        </div>
                     </div>
-                </section>
+                </div>
+                
+                <!-- TOP METRIC CARDS -->
+                <div class="card metric-card-container">
+                    <div class="metric-icon-bg">📈</div>
+                    <div class="metric-value-large">15.847</div>
+                    <div class="metric-label-large">LEITURAS TOTAIS</div>
+                    <div class="metric-trend-badge positive">+1.2K HOJE</div>
+                </div>
+                
+                <div class="card metric-card-container">
+                    <div class="metric-icon-bg amber">⚡</div>
+                    <div class="metric-value-large amber">1.847 W</div>
+                    <div class="metric-label-large">POTÊNCIA MÉDIA</div>
+                    <div class="metric-trend-badge positive">+124W</div>
+                </div>
+                
+                <div class="card metric-card-container">
+                    <div class="metric-icon-bg green">⏱️</div>
+                    <div class="metric-value-large green">99.2%</div>
+                    <div class="metric-label-large">UPTIME DO SISTEMA</div>
+                    <div class="metric-trend-badge positive green">+0.3% ↑</div>
+                    <div class="mini-sparkline"></div>
+                </div>
+                
+                <!-- SENSOR DISTRIBUTION DONUT -->
+                <div class="card donut-chart">
+                    <div class="card-header">
+                        <h3 class="card-title">DISTRIBUIÇÃO POR TIPO DE SENSOR</h3>
+                        <p class="card-subtitle">Sensores ativos por categoria</p>
+                    </div>
+                    <div class="donut-container">
+                        <div class="donut-chart-wrapper">
+                            <canvas id="donutChart"></canvas>
+                            <div class="donut-center">
+                                <div class="donut-total">24</div>
+                                <div class="donut-label">SENSORES</div>
+                                <div class="donut-status">
+                                    <div class="status-dot pulsing"></div>
+                                    ATIVOS
+                                </div>
+                            </div>
+                        </div>
+                        <div class="donut-legend">
+                            <div class="legend-item-detailed">
+                                <div class="legend-header">
+                                    <div class="legend-dot orange"></div>
+                                    <span class="legend-name">TEMPERATURA</span>
+                                    <div class="legend-stats">
+                                        <span class="legend-count">12</span>
+                                        <span class="legend-percent">(35%)</span>
+                                    </div>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill orange" style="width: 35%"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="legend-item-detailed">
+                                <div class="legend-header">
+                                    <div class="legend-dot cyan"></div>
+                                    <span class="legend-name">PRESSÃO</span>
+                                    <div class="legend-stats">
+                                        <span class="legend-count">6</span>
+                                        <span class="legend-percent">(25%)</span>
+                                    </div>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill cyan" style="width: 25%"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="legend-item-detailed">
+                                <div class="legend-header">
+                                    <div class="legend-dot amber"></div>
+                                    <span class="legend-name">VELOCIDADE</span>
+                                    <div class="legend-stats">
+                                        <span class="legend-count">6</span>
+                                        <span class="legend-percent">(40%)</span>
+                                    </div>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill amber" style="width: 40%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- WEEKLY PERFORMANCE BAR CHART -->
+                <div class="card bar-chart">
+                    <div class="card-header">
+                        <h3 class="card-title">DESEMPENHO SEMANAL</h3>
+                        <div class="week-total">TOTAL SEMANA: 124K</div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="barChart"></canvas>
+                    </div>
+                </div>
+                
+                <!-- GAUGE METER - SYSTEM HEALTH -->
+                <div class="card gauge-card">
+                    <div class="card-header">
+                        <h3 class="card-title">SAÚDE DO SISTEMA</h3>
+                    </div>
+                    <div class="gauge-container">
+                        <div class="gauge-wrapper">
+                            <canvas id="gaugeChart"></canvas>
+                            <div class="gauge-center">
+                                <div class="gauge-value">92%</div>
+                                <div class="gauge-label">SAÚDE DO SISTEMA</div>
+                            </div>
+                        </div>
+                        <div class="gauge-status">
+                            ⚡ PERFORMANCE EXCELENTE
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- MOTOR STATUS PANEL -->
+                <div class="card status-panel">
+                    <div class="card-header">
+                        <h3 class="card-title">STATUS AO VIVO</h3>
+                        <div class="online-badge pulsing">8 ONLINE</div>
+                    </div>
+                    <div class="motor-list">
+                        <div class="motor-item online">
+                            <div class="motor-icon">🏍️</div>
+                            <div class="motor-info">
+                                <div class="motor-name">Motor A1</div>
+                                <div class="motor-power">1500W</div>
+                                <div class="motor-temp">85°C</div>
+                            </div>
+                            <div class="status-indicator online"></div>
+                        </div>
+                        
+                        <div class="motor-item online">
+                            <div class="motor-icon">🏍️</div>
+                            <div class="motor-info">
+                                <div class="motor-name">Motor B2</div>
+                                <div class="motor-power">1200W</div>
+                                <div class="motor-temp">78°C</div>
+                            </div>
+                            <div class="status-indicator online"></div>
+                        </div>
+                        
+                        <div class="motor-item online">
+                            <div class="motor-icon">🏍️</div>
+                            <div class="motor-info">
+                                <div class="motor-name">Motor C3</div>
+                                <div class="motor-power">1800W</div>
+                                <div class="motor-temp">92°C</div>
+                            </div>
+                            <div class="status-indicator online"></div>
+                        </div>
+                        
+                        <div class="motor-item offline">
+                            <div class="motor-icon">🏍️</div>
+                            <div class="motor-info">
+                                <div class="motor-name">Motor D4</div>
+                                <div class="motor-power">0W</div>
+                                <div class="motor-temp">--°C</div>
+                            </div>
+                            <div class="status-indicator offline"></div>
+                        </div>
+                        
+                        <div class="motor-item online">
+                            <div class="motor-icon">🏍️</div>
+                            <div class="motor-info">
+                                <div class="motor-name">Motor E5</div>
+                                <div class="motor-power">1650W</div>
+                                <div class="motor-temp">88°C</div>
+                            </div>
+                            <div class="status-indicator online"></div>
+                        </div>
+                        
+                        <div class="motor-item online">
+                            <div class="motor-icon">🏍️</div>
+                            <div class="motor-info">
+                                <div class="motor-name">Motor F6</div>
+                                <div class="motor-power">1400W</div>
+                                <div class="motor-temp">81°C</div>
+                            </div>
+                            <div class="status-indicator online"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- CRITICAL ALERTS FEED -->
+                <div class="card alerts-panel">
+                    <div class="card-header">
+                        <h3 class="card-title">ALERTAS CRÍTICOS</h3>
+                        <div class="alert-count pulsing-red">03</div>
+                    </div>
+                    <div class="alerts-list">
+                        <div class="alert-item critical">
+                            <div class="alert-icon pulsing">🔥</div>
+                            <div class="alert-content">
+                                <div class="alert-title">TEMPERATURA CRÍTICA</div>
+                                <div class="alert-details">Motor D4 • 98°C</div>
+                                <div class="alert-timestamp">Há 2 min</div>
+                                <button class="alert-action">VER DETALHES ›</button>
+                            </div>
+                        </div>
+                        
+                        <div class="alert-item warning">
+                            <div class="alert-icon">⚠️</div>
+                            <div class="alert-content">
+                                <div class="alert-title">PRESSÃO ELEVADA</div>
+                                <div class="alert-details">Sensor P2 • 4.2 bar</div>
+                                <div class="alert-timestamp">Há 5 min</div>
+                                <button class="alert-action">VER DETALHES ›</button>
+                            </div>
+                        </div>
+                        
+                        <div class="alert-item warning">
+                            <div class="alert-icon">🔋</div>
+                            <div class="alert-content">
+                                <div class="alert-title">BATERIA BAIXA</div>
+                                <div class="alert-details">Sensor V3 • 15%</div>
+                                <div class="alert-timestamp">Há 12 min</div>
+                                <button class="alert-action">VER DETALHES ›</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
             </div>
         </main>
     </div>
     
+    <!-- Speed Lines Decorative Elements -->
+    <div class="speed-lines-decoration">
+        <div class="speed-line-dec"></div>
+        <div class="speed-line-dec"></div>
+        <div class="speed-line-dec"></div>
+        <div class="speed-line-dec"></div>
+        <div class="speed-line-dec"></div>
+    </div>
+    
+    <!-- Corner Accents -->
+    <div class="corner-accent top-left"></div>
+    <div class="corner-accent bottom-right"></div>
+    
     <!-- JavaScript -->
-    <script src="{% static 'dashboard/js/dashboard.js' %}"></script>
+    <script src="{% static 'dashboard/js/motosense.js' %}"></script>
+    <script src="{% static 'dashboard/js/api-integration.js' %}"></script>
 </body>
 </html>
