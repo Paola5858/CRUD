@@ -13,11 +13,19 @@
     
     <!-- CSS -->
     {% load static %}
-    <link rel="stylesheet" href="{% static 'css/motosense-crud.css' %}">
+    <link rel="stylesheet" href="{% static 'css/motosense-dashboard.css' %}">
 </head>
 <body>
     <!-- Hex Pattern Overlay -->
     <div class="hex-pattern-overlay"></div>
+    
+    <!-- Sidebar Toggle Button -->
+    <button class="sidebar-toggle" id="sidebarToggle">
+        ☰
+    </button>
+    
+    <!-- Sidebar Overlay -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
     
     <!-- Main Container -->
     <div class="dashboard-container">
@@ -478,7 +486,50 @@
     <div class="corner-accent top-left"></div>
     <div class="corner-accent bottom-right"></div>
     
+    <!-- Dados do Backend -->
+    <script>
+        // Dados vindos do Django
+        window.DASHBOARD_BACKEND = {{ dashboard_json|safe|default:'{}' }};
+    </script>
+    
     <!-- JavaScript -->
-    <script src="{% static 'js/motosense-crud.js' %}"></script>
+    <script src="{% static 'js/motosense-dashboard.js' %}"></script>
+    
+    <!-- Sidebar Toggle Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebarToggle = document.getElementById('sidebarToggle');
+            const sidebar = document.querySelector('.sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            const mainContent = document.querySelector('.main-content');
+            
+            function toggleSidebar() {
+                sidebar.classList.toggle('open');
+                overlay.classList.toggle('active');
+                mainContent.classList.toggle('sidebar-open');
+            }
+            
+            function closeSidebar() {
+                sidebar.classList.remove('open');
+                overlay.classList.remove('active');
+                mainContent.classList.remove('sidebar-open');
+            }
+            
+            if (sidebarToggle) {
+                sidebarToggle.addEventListener('click', toggleSidebar);
+            }
+            
+            if (overlay) {
+                overlay.addEventListener('click', closeSidebar);
+            }
+            
+            // Fechar sidebar ao redimensionar para desktop
+            window.addEventListener('resize', function() {
+                if (window.innerWidth > 1024) {
+                    closeSidebar();
+                }
+            });
+        });
+    </script>
 </body>
 </html>

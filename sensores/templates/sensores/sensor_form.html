@@ -1,84 +1,21 @@
 {% extends 'sensores/base.html' %}
 
-{% block title %}{% if form.instance.pk %}Editar Sensor{% else %}Criar Sensor{% endif %} - MOTOSENSE{% endblock %}
+{% block title %}MOTOSENSE - Formulário Sensor{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-8">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="mb-0">
-                    {% if form.instance.pk %}
-                        📝 Editar Sensor
-                    {% else %}
-                        ➕ Criar Novo Sensor
-                    {% endif %}
-                </h5>
+<div class="container">
+    <div class="card" style="max-width: 600px; margin: 0 auto;">
+        <h2 class="title title-md">Formulário de Sensor</h2>
+        
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            
+            <div style="margin-top: var(--space-lg);">
+                <button type="submit" class="btn btn-primary">Salvar</button>
+                <a href="{% url 'sensores:listar_sensor' %}" class="btn btn-secondary">Cancelar</a>
             </div>
-            <div class="card-body">
-                <form method="post" id="sensorForm">
-                    {% csrf_token %}
-                    <div class="mb-3">
-                        <label for="{{ form.tipo.id_for_label }}" class="form-label">Tipo do Sensor *</label>
-                        {{ form.tipo }}
-                        <div class="invalid-feedback" id="tipo-error"></div>
-                    </div>
-                    <div class="mb-3">
-                        <label for="{{ form.precisao.id_for_label }}" class="form-label">Precisão *</label>
-                        {{ form.precisao }}
-                        <div class="invalid-feedback" id="precisao-error"></div>
-                        <div class="form-text">Valor numérico da precisão do sensor</div>
-                    </div>
-                    <div class="d-flex gap-2">
-                        <button type="submit" class="btn btn-primary" id="submitBtn">
-                            <span class="spinner-border spinner-border-sm d-none" id="loadingSpinner"></span>
-                            <i class="fas fa-save" id="saveIcon"></i> Salvar
-                        </button>
-                        <a href="{% url 'sensores:listar_sensor' %}" class="btn btn-secondary">
-                            <i class="fas fa-arrow-left"></i> Voltar
-                        </a>
-                    </div>
-                </form>
-            </div>
-        </div>
+        </form>
     </div>
 </div>
-
-<script>
-document.getElementById('sensorForm').addEventListener('submit', function(e) {
-    const submitBtn = document.getElementById('submitBtn');
-    const loadingSpinner = document.getElementById('loadingSpinner');
-    const saveIcon = document.getElementById('saveIcon');
-    
-    // Validação frontend
-    let isValid = true;
-    const tipo = document.getElementById('{{ form.tipo.id_for_label }}');
-    const precisao = document.getElementById('{{ form.precisao.id_for_label }}');
-    
-    // Reset errors
-    document.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
-    
-    if (!tipo.value.trim()) {
-        tipo.classList.add('is-invalid');
-        document.getElementById('tipo-error').textContent = 'Tipo é obrigatório';
-        isValid = false;
-    }
-    
-    if (!precisao.value || precisao.value <= 0) {
-        precisao.classList.add('is-invalid');
-        document.getElementById('precisao-error').textContent = 'Precisão deve ser um valor positivo';
-        isValid = false;
-    }
-    
-    if (!isValid) {
-        e.preventDefault();
-        return;
-    }
-    
-    // Loading state
-    submitBtn.disabled = true;
-    loadingSpinner.classList.remove('d-none');
-    saveIcon.classList.add('d-none');
-});
-</script>
 {% endblock %}

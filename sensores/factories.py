@@ -29,7 +29,11 @@ class CrudFactory:
             raise ValueError(f"Modelo inválido: {model_name}")
 
         if action == 'list':
-            if model_name == 'dados':
+            if model_name == 'motor':
+                return ListStrategy(service, form_class, 'sensores/listar_motor.html')
+            elif model_name == 'sensor':
+                return ListStrategy(service, form_class, 'sensores/listar_sensor.html')
+            elif model_name == 'dados':
                 return ListStrategy(service, form_class, 'sensores/listar_dados.html')
             elif model_name == 'sensormotor':
                 return ListStrategy(service, form_class, 'sensores/sensormotor_list.html')

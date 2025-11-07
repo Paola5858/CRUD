@@ -1,19 +1,20 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MOTOSENSE - Gerenciamento de Motores</title>
-    
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Teko:wght@400;500;600;700;800&family=Barlow:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
-    
-    <!-- CSS -->
-    {% load static %}
-    <link rel="stylesheet" href="{% static 'css/motosense-crud.css' %}">
-    <link rel="stylesheet" href="{% static 'css/motosense-table-rows.css' %}">
-</head>
-<body>
+{% extends 'base_optimized.html' %}
+{% load static %}
+
+{% block title %}MOTOSENSE - Motores{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/motosense-crud.css' %}?v={{ css_version }}">
+<style>
+/* Critical CSS para motores */
+.motor-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: var(--space-lg); }
+.motor-card { background: var(--dark); border: 2px solid rgba(255,107,0,0.2); border-radius: var(--radius-md); padding: var(--space-lg); }
+.motor-card:hover { border-color: var(--primary); }
+</style>
+{% endblock %}
+
+{% block content %}
+
     <!-- Hex Pattern Overlay -->
     <div class="hex-pattern-overlay"></div>
     
@@ -481,7 +482,98 @@
         window.MOTORES_BACKEND = {{ motores_json|safe|default:'[]' }};
     </script>
     
+    <!-- Sistema de Notificações -->
+    <div id="notificationContainer" class="notification-container"></div>
+    
     <!-- JavaScript -->
-    <script src="{% static 'js/motosense-crud.js' %}"></script>
-</body>
-</html>
+    <script>
+        // CSRF Token para AJAX
+        window.CSRF_TOKEN = '{{ csrf_token }}';
+        
+        // Sistema de Notificações
+        function showNotification(message, type = 'success', duration = 5000) {
+            const container = document.getElementById('notificationContainer');
+            const notification = document.createElement('div');
+            notification.className = `notification notification-${type}`;
+            
+            const icons = {
+                success: '✅',
+                error: '❌',
+                warning: '⚠️',
+                info: 'ℹ️'
+            };
+            
+            notification.innerHTML = `
+                <div class="notification-content">
+                    <span class="notification-icon">${icons[type] || icons.info}</span>
+                    <span class="notification-message">${message}</span>
+                    <button class="notification-close" onclick="this.parentElement.parentElement.remove()">✕</button>
+                </div>
+            `;
+            
+            container.appendChild(notification);
+            
+            // Auto-remove após duration
+            setTimeout(() => {
+                if (notification.parentElement) {
+                    notification.remove();
+                }
+            }, duration);
+        }
+        
+        // Interceptar submissão de formulários
+        document.addEventListener('DOMContentLoaded', function() {
+            const motorForm = document.getElementById('motorForm');
+            if (motorForm) {
+                motorForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    const formData = new FormData(this);
+                    const submitBtn = this.querySelector('.btn-save');
+                    const originalText = submitBtn.innerHTML;
+                    
+                    // Loading state
+                    submitBtn.innerHTML = '<span class="btn-icon">⏳</span><span class="btn-text">SALVANDO...</span>';
+                    submitBtn.disabled = true;
+                    
+                    fetch(this.action, {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-CSRFToken': window.CSRF_TOKEN,
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            showNotification('Motor salvo com sucesso!', 'success');
+                            document.getElementById('modalOverlay').style.display = 'none';
+                            this.reset();
+                            // Recarregar dados da tabela
+                            if (window.loadMotorData) {
+                                window.loadMotorData();
+                            }
+                        } else {
+                            showNotification(data.message || 'Erro ao salvar motor', 'error');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Erro:', error);
+                        showNotification('Erro de conexão. Tente novamente.', 'error');
+                    })
+                    .finally(() => {
+                        // Restore button
+                        submitBtn.innerHTML = originalText;
+                        submitBtn.disabled = false;
+                    });
+                });
+            }
+        });
+    </script>
+    <script src="{% static 'js/motosense-interactive.js' %}"></script>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/motosense-interactive.js' %}?v={{ js_version }}"></script>
+{% endblock %}
