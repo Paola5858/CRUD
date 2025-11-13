@@ -102,14 +102,14 @@
                     <span class="stat-icon">🔥</span>
                     <div class="stat-info">
                         <div class="stat-label">MOTORES ATIVOS</div>
-                        <div class="stat-value">8/12</div>
+                        <div class="stat-value">{{ total_motores }}</div>
                     </div>
                 </div>
                 <div class="quick-stat">
                     <span class="stat-icon">⚡</span>
                     <div class="stat-info">
                         <div class="stat-label">POTÊNCIA TOTAL</div>
-                        <div class="stat-value">24.2 kW</div>
+                        <div class="stat-value">{{ potencia_total }} kW</div>
                     </div>
                 </div>
             </div>
@@ -153,27 +153,27 @@
                     <div class="metric-card">
                         <div class="metric-icon">🌡️</div>
                         <div class="metric-content">
-                            <div class="metric-value">78°C</div>
+                            <div class="metric-value">{{ temperatura_media }}°C</div>
                             <div class="metric-label">TEMP MÉDIA</div>
-                            <div class="metric-trend up">↗ +2°C</div>
+                            <div class="metric-trend up">↗ Dados Reais</div>
                         </div>
                     </div>
                     
                     <div class="metric-card">
-                        <div class="metric-icon rotating">🔄</div>
+                        <div class="metric-icon rotating">📊</div>
                         <div class="metric-content">
-                            <div class="metric-value cyan">3.450</div>
-                            <div class="metric-label">RPM MÉDIO</div>
-                            <div class="metric-trend up cyan">↗ +120</div>
+                            <div class="metric-value cyan">{{ total_sensores }}</div>
+                            <div class="metric-label">SENSORES</div>
+                            <div class="metric-trend up cyan">↗ Ativos</div>
                         </div>
                     </div>
                     
                     <div class="metric-card">
                         <div class="metric-icon pulsing-red">⚠️</div>
                         <div class="metric-content">
-                            <div class="metric-value red">03</div>
+                            <div class="metric-value red">{{ alertas_criticos }}</div>
                             <div class="metric-label">ALERTAS</div>
-                            <div class="metric-trend critical">! AÇÃO NECESSÁRIA</div>
+                            <div class="metric-trend critical">! QuerySet Real</div>
                         </div>
                     </div>
                 </div>
@@ -215,7 +215,7 @@
                         <div class="growth-highlight">
                             <div class="growth-icon">🔥</div>
                             <div class="growth-content">
-                                <div class="growth-value">+47.8%</div>
+                                <div class="growth-value">{% if growth_rate > 0 %}+{% endif %}{{ growth_rate }}%</div>
                                 <div class="growth-label">CRESCIMENTO</div>
                             </div>
                         </div>
@@ -239,36 +239,59 @@
                     </div>
                 </div>
                 
-                <!-- METRIC CARDS -->
+                <!-- METRIC CARDS COM DADOS REAIS -->
                 <div class="card metric-card-container">
-                    <div class="metric-icon-bg">📈</div>
-                    <div class="metric-value-large">15.847</div>
-                    <div class="metric-label-large">LEITURAS TOTAIS</div>
-                    <div class="metric-trend-badge positive">+1.2K HOJE</div>
+                    <div class="metric-icon-bg">🏍️</div>
+                    <div class="metric-value-large">{{ total_motores }}</div>
+                    <div class="metric-label-large">TOTAL MOTORES</div>
+                    <div class="metric-trend-badge positive">QuerySet Real</div>
                 </div>
                 
                 <div class="card metric-card-container">
-                    <div class="metric-icon-bg amber">⚡</div>
-                    <div class="metric-value-large amber">1.847 W</div>
-                    <div class="metric-label-large">POTÊNCIA MÉDIA</div>
-                    <div class="metric-trend-badge positive">+124W</div>
+                    <div class="metric-icon-bg amber">📡</div>
+                    <div class="metric-value-large amber">{{ total_sensores }}</div>
+                    <div class="metric-label-large">TOTAL SENSORES</div>
+                    <div class="metric-trend-badge positive">Banco Real</div>
                 </div>
                 
                 <div class="card metric-card-container">
-                    <div class="metric-icon-bg green">⏱️</div>
-                    <div class="metric-value-large green">99.2%</div>
-                    <div class="metric-label-large">UPTIME DO SISTEMA</div>
-                    <div class="metric-trend-badge positive green">+0.3% ↑</div>
+                    <div class="metric-icon-bg green">🔗</div>
+                    <div class="metric-value-large green">{{ total_sensor_motor }}</div>
+                    <div class="metric-label-large">RELAÇÕES S-M</div>
+                    <div class="metric-trend-badge positive green">Dados Reais</div>
                 </div>
                 
-                <!-- DONUT CHART -->
-                <div class="card donut-chart">
+                <!-- ÚLTIMOS DADOS REAIS -->
+                <div class="card">
                     <div class="card-header">
-                        <h3 class="card-title">DISTRIBUIÇÃO POR TIPO</h3>
-                        <p class="card-subtitle">Sensores ativos por categoria</p>
+                        <h3 class="card-title">ÚLTIMOS 10 REGISTROS</h3>
+                        <p class="card-subtitle">Dados reais do QuerySet</p>
                     </div>
-                    <div class="chart-container">
-                        <canvas id="donutChart"></canvas>
+                    <div class="card-body">
+                        <table class="table-simple">
+                            <thead>
+                                <tr>
+                                    <th>Data/Hora</th>
+                                    <th>Sensor</th>
+                                    <th>Motor</th>
+                                    <th>Valor</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for dado in ultimos_dados %}
+                                <tr>
+                                    <td>{{ dado.data_hora|date:"d/m/Y H:i" }}</td>
+                                    <td>{{ dado.sensor.tipo }}</td>
+                                    <td>{{ dado.motor.nome }}</td>
+                                    <td>{{ dado.valor }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="4">Nenhum dado encontrado.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
                     </div>
                 </div>
                 
@@ -291,7 +314,7 @@
                     <div class="chart-container">
                         <canvas id="gaugeChart"></canvas>
                         <div class="gauge-center">
-                            <div class="gauge-value">92%</div>
+                            <div class="gauge-value">{{ dashboard_json.gauge_value|default:0 }}%</div>
                             <div class="gauge-label">SAÚDE</div>
                         </div>
                     </div>
