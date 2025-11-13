@@ -1,16 +1,15 @@
-from django.shortcuts import render, redirect
-from django.contrib.auth.views import LoginView, LogoutView
+from django.contrib.auth.views import LoginView as AuthLoginView, LogoutView as AuthLogoutView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import TemplateView, UpdateView
 from django.urls import reverse_lazy
 from django.contrib.auth.models import User
 from .forms import EditPerfilForm
 
-class LoginView(LoginView):
+class LoginView(AuthLoginView):
     template_name = 'login.html'
     redirect_authenticated_user = True
 
-class LogoutView(LogoutView):
+class LogoutView(AuthLogoutView):
     next_page = reverse_lazy('login')
 
 class PerfilView(LoginRequiredMixin, TemplateView):
@@ -21,6 +20,6 @@ class EditPerfilView(LoginRequiredMixin, UpdateView):
     form_class = EditPerfilForm
     template_name = 'edit_perfil.html'
     success_url = reverse_lazy('profile')
-    
+
     def get_object(self):
         return self.request.user

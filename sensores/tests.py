@@ -4,8 +4,8 @@ Testes unitários para o app sensores
 from django.test import TestCase, Client
 from django.contrib.auth.models import User
 from django.urls import reverse
-from .models import Motor, Sensor, DadosSensor
-from .services import MotorService, SensorService
+from .models import Motor, Sensor
+from .services import MotorService
 
 
 class MotorModelTest(TestCase):

@@ -38,10 +38,14 @@ if not SECRET_KEY or SECRET_KEY == 'django-insecure-dev-only-key-never-use-in-pr
         raise ValueError("A variável de ambiente SECRET_KEY não está definida ou está usando valor inseguro. "
                          "Configure uma chave segura para produção.")
 
-# Hosts permitidos
+# Hosts permitidos - Remove 0.0.0.0 for security in production
 hosts_env = os.getenv('ALLOWED_HOSTS', '')
 if hosts_env:
-    ALLOWED_HOSTS = [host.strip() for host in hosts_env.split(',') if host.strip()]
+    ALLOWED_HOSTS = [
+        host.strip()
+        for host in hosts_env.split(",")
+        if host.strip() and host.strip() != "0.0.0.0"
+    ]
 else:
     if DEBUG:
         ALLOWED_HOSTS = ['localhost', '127.0.0.1']
@@ -188,6 +192,7 @@ else:
     # Desenvolvimento: sem cache para facilitar debug
     STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
 
+# Compressão de assets (se whitenoise estiver instalado)
 # Compressão de assets (se whitenoise estiver instalado)
 try:
     import whitenoise

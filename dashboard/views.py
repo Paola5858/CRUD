@@ -36,8 +36,20 @@ def get_real_chart_data():
 
     # Fallback para garantir 12 meses de dados para o gráfico
     while len(labels) < 12:
-        last_month = datetime.strptime(labels[-1], '%b') if labels else hoje
-        next_month = (last_month + timedelta(days=32)).strftime('%b').upper()
+        # Use a safer approach for month calculation
+        if labels:
+            # Parse the last month and add one month
+            month_names = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC']
+            last_month_str = labels[-1]
+            try:
+                last_month_idx = month_names.index(last_month_str)
+                next_month_idx = (last_month_idx + 1) % 12
+                next_month = month_names[next_month_idx]
+            except ValueError:
+                next_month = 'JAN'
+        else:
+            next_month = 'JAN'
+
         labels.append(next_month)
         temp_data.append(temp_data[-1] * 0.95 if temp_data else 25)
         press_data.append(press_data[-1] * 0.95 if press_data else 20)

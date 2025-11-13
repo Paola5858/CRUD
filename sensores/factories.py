@@ -1,6 +1,6 @@
 from .strategies import ListStrategy, CreateStrategy, UpdateStrategy, DeleteStrategy
-from .services import MotorService, SensorService, DadosSensorService, SensorMotorService
-from .forms import MotorForm, SensorForm, DadosForm, SensorMotorForm
+from .services import MotorService, DadosSensorService, SensorMotorService
+from .forms import MotorForm, DadosForm, SensorMotorForm
 import logging
 
 logger = logging.getLogger(__name__)
@@ -13,9 +13,9 @@ class CrudFactory:
             form_class = MotorForm
             template_base = 'sensores/motor'
         elif model_name == 'sensor':
-            service = SensorService()
-            form_class = SensorForm
-            template_base = 'sensores/sensor'
+            # Sensor functionality removed
+            logger.error(f"Modelo sensor não suportado: {model_name}")
+            raise ValueError(f"Modelo sensor não suportado: {model_name}")
         elif model_name == 'dados':
             service = DadosSensorService()
             form_class = DadosForm
@@ -32,7 +32,8 @@ class CrudFactory:
             if model_name == 'motor':
                 return ListStrategy(service, form_class, 'sensores/listar_motor.html')
             elif model_name == 'sensor':
-                return ListStrategy(service, form_class, 'sensores/listar_sensor.html')
+                # Sensor functionality removed
+                raise ValueError(f"Modelo sensor não suportado: {model_name}")
             elif model_name == 'dados':
                 return ListStrategy(service, form_class, 'sensores/listar_dados.html')
             elif model_name == 'sensormotor':

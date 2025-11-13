@@ -1,5 +1,4 @@
 from django.shortcuts import render
-from django.views.decorators.cache import cache_page
 from django.contrib.auth.decorators import login_required
 from .models import Motor, Sensor, SensorMotor, DadosSensor
 from .constants import DASHBOARD_RECENT_LIMIT

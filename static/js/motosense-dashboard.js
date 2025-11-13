@@ -8,20 +8,17 @@
 document.addEventListener('DOMContentLoaded', function() {
     console.log('🏍️ MOTOSENSE Dashboard Initializing...');
 
-    if (!window.DASHBOARD_BACKEND || typeof Chart === 'undefined') {
-        console.error('❌ Backend data or Chart.js is not available. Dashboard cannot be initialized.');
+    if (typeof Chart === 'undefined') {
+        console.error('❌ Chart.js is not available. Dashboard cannot be initialized.');
         return;
     }
-
-    const backendData = window.DASHBOARD_BACKEND;
-    console.log('✅ Backend data loaded:', backendData);
 
     // Initialize all charts with a single delay
     setTimeout(() => {
         console.log('Initializing charts...');
-        initMainChart(backendData.chart_main);
-        initBarChart(backendData.weekly_performance);
-        initGaugeChart(backendData.gauge_value);
+        initMainChart();
+        initBarChart();
+        initGaugeChart();
     }, 300);
 
     // Update time immediately and then every second
@@ -43,19 +40,20 @@ const chartColors = {
 };
 
 // ━━━ MAIN CHART (LINE) ━━━
-function initMainChart(chartData) {
+function initMainChart() {
     const ctx = document.getElementById('mainChart');
-    if (!ctx || !chartData) {
-        console.warn('MainChart canvas or data not found');
+    if (!ctx) {
+        console.warn('MainChart canvas not found');
         return;
     }
 
+    // Sample data for demonstration
     const data = {
-        labels: chartData.labels,
+        labels: ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00'],
         datasets: [
-            { label: 'Temperatura', data: chartData.temperatura, borderColor: chartColors.orange, backgroundColor: chartColors.orange + '20', borderWidth: 3, fill: true, tension: 0.4 },
-            { label: 'Pressão', data: chartData.pressao, borderColor: chartColors.cyan, backgroundColor: chartColors.cyan + '20', borderWidth: 3, fill: true, tension: 0.4 },
-            { label: 'Velocidade', data: chartData.velocidade, borderColor: chartColors.amber, backgroundColor: chartColors.amber + '20', borderWidth: 3, fill: true, tension: 0.4 }
+            { label: 'Temperatura', data: [65, 70, 75, 80, 78, 72], borderColor: chartColors.orange, backgroundColor: chartColors.orange + '20', borderWidth: 3, fill: true, tension: 0.4 },
+            { label: 'Pressão', data: [2.1, 2.3, 2.5, 2.4, 2.2, 2.0], borderColor: chartColors.cyan, backgroundColor: chartColors.cyan + '20', borderWidth: 3, fill: true, tension: 0.4 },
+            { label: 'Velocidade', data: [1800, 2200, 2800, 3200, 2900, 2400], borderColor: chartColors.amber, backgroundColor: chartColors.amber + '20', borderWidth: 3, fill: true, tension: 0.4 }
         ]
     };
 
@@ -65,19 +63,20 @@ function initMainChart(chartData) {
 }
 
 // ━━━ BAR CHART ━━━
-function initBarChart(chartData) {
+function initBarChart() {
     const ctx = document.getElementById('barChart');
-    if (!ctx || !chartData) {
-        console.warn('BarChart canvas or data not found');
+    if (!ctx) {
+        console.warn('BarChart canvas not found');
         return;
     }
 
+    // Sample data for demonstration
     const data = {
-        labels: chartData.labels,
+        labels: ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'],
         datasets: [
-            { label: 'Temperatura', data: chartData.temperatura, backgroundColor: chartColors.orange + '80', borderColor: chartColors.orange, borderWidth: 2 },
-            { label: 'Pressão', data: chartData.pressao, backgroundColor: chartColors.cyan + '80', borderColor: chartColors.cyan, borderWidth: 2 },
-            { label: 'Velocidade', data: chartData.velocidade, backgroundColor: chartColors.amber + '80', borderColor: chartColors.amber, borderWidth: 2 }
+            { label: 'Temperatura', data: [68, 72, 75, 78, 76, 70, 69], backgroundColor: chartColors.orange + '80', borderColor: chartColors.orange, borderWidth: 2 },
+            { label: 'Pressão', data: [2.2, 2.4, 2.3, 2.5, 2.1, 2.0, 2.3], backgroundColor: chartColors.cyan + '80', borderColor: chartColors.cyan, borderWidth: 2 },
+            { label: 'Velocidade', data: [2000, 2400, 2800, 3200, 2900, 2200, 2100], backgroundColor: chartColors.amber + '80', borderColor: chartColors.amber, borderWidth: 2 }
         ]
     };
 
@@ -88,12 +87,15 @@ function initBarChart(chartData) {
 }
 
 // ━━━ GAUGE CHART ━━━
-function initGaugeChart(value) {
+function initGaugeChart() {
     const ctx = document.getElementById('gaugeChart');
     if (!ctx) {
         console.warn('GaugeChart canvas not found');
         return;
     }
+
+    // Sample value for demonstration
+    const value = 75;
 
     const data = {
         datasets: [{

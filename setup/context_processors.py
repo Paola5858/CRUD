@@ -1,7 +1,6 @@
 """
 Context processors para otimização de assets
 """
-import os
 import hashlib
 from pathlib import Path
 from django.conf import settings
@@ -17,20 +16,20 @@ def asset_versions(request):
         safe_path = Path(file_path).as_posix()
         if '..' in safe_path or safe_path.startswith('/'):
             return '1.0'
-            
+
         cache_key = f'asset_version_{safe_path.replace("/", "_")}'
         version = cache.get(cache_key)
-        
+
         if version is None:
             try:
                 # Use Path for secure path handling
                 base_path = Path(settings.BASE_DIR) / 'static'
                 full_path = base_path / safe_path
-                
+
                 # Ensure the resolved path is within the static directory
                 if not str(full_path.resolve()).startswith(str(base_path.resolve())):
                     return '1.0'
-                    
+
                 if full_path.exists():
                     with open(full_path, 'rb') as f:
                         content = f.read()
@@ -38,7 +37,7 @@ def asset_versions(request):
                         version = hashlib.sha256(content).hexdigest()[:8]
                 else:
                     version = '1.0'
-                
+
                 # Cache por 1 hora em desenvolvimento, 24h em produção
                 timeout = 3600 if settings.DEBUG else 86400
                 cache.set(cache_key, version, timeout)
@@ -49,9 +48,9 @@ def asset_versions(request):
                     logger = logging.getLogger(__name__)
                     logger.warning(f'Asset version error for {safe_path}: {e}')
                 version = '1.0'
-        
+
         return version
-    
+
     return {
         'css_version': get_file_version('css/motosense-core.css'),
         'js_version': get_file_version('js/motosense-interactive.js'),
