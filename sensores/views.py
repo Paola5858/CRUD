@@ -4,23 +4,28 @@ from django.http import Http404
 from django.contrib import messages
 from django.db import IntegrityError
 import logging
+import json
 from .factories import CrudFactory
 from .models import Motor, Sensor, SensorMotor, DadosSensor
 
 logger = logging.getLogger(__name__)
 
 def dashboard(request):
-    from .models import Motor, Sensor, SensorMotor, DadosSensor
     total_motores = Motor.objects.count()
     total_sensores = Sensor.objects.count()
     total_sensor_motor = SensorMotor.objects.count()
     ultimos_dados = DadosSensor.objects.select_related('motor', 'sensor').order_by('-data_hora')[:10]
+
+    # Serialização dos dados para o gráfico
+    ultimos_dados_list = list(ultimos_dados.values('data_hora', 'valor', 'sensor__tipo', 'motor__nome'))
+    ultimos_dados_json = json.dumps(ultimos_dados_list, default=str)
 
     context = {
         'total_motores': total_motores,
         'total_sensores': total_sensores,
         'total_sensor_motor': total_sensor_motor,
         'ultimos_dados': ultimos_dados,
+        'ultimos_dados_json': ultimos_dados_json,
     }
     return render(request, 'sensores/dashboard.html', context)
 

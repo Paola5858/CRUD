@@ -1,5 +1,7 @@
 from django.shortcuts import render
+from django.views.decorators.cache import cache_page
 from .models import Motor, Sensor, SensorMotor, DadosSensor
+from .constants import DASHBOARD_RECENT_LIMIT
 
 def dashboard(request):
     """Dashboard com QuerySet conforme especificação"""
@@ -9,7 +11,7 @@ def dashboard(request):
     total_motores = Motor.objects.count()
     total_sensores = Sensor.objects.count()
     total_sensor_motor = SensorMotor.objects.count()
-    ultimos_dados = DadosSensor.objects.select_related('motor', 'sensor').order_by('-data_hora')[:10]
+    ultimos_dados = DadosSensor.objects.select_related('motor', 'sensor').order_by('-data_hora')[:DASHBOARD_RECENT_LIMIT]
     
     # Serializar dados para JavaScript
     ultimos_dados_json = json.dumps([

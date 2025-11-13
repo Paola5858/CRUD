@@ -48,7 +48,7 @@ class DadosSensor(models.Model):
     """
     Modelo para armazenar dados coletados pelos sensores.
     """
-    data_hora = models.DateTimeField(auto_now=True, help_text="Data e hora da coleta")
+    data_hora = models.DateTimeField(auto_now=True, help_text="Data e hora da coleta", db_index=True)
     motor = models.ForeignKey(Motor, on_delete=models.CASCADE, help_text="Motor relacionado")
     sensor = models.ForeignKey(Sensor, on_delete=models.CASCADE, help_text="Sensor que coletou o dado")
     valor = models.FloatField(help_text="Valor coletado pelo sensor")
