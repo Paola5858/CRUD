@@ -294,6 +294,249 @@ function getTypeConfig(type) {
 }
 
 // ━━━ TABLE RENDERING ━━━
+function createTableRowElement(motor, index) {
+    const statusConfig = getStatusConfig(motor.status);
+    const typeConfig = getTypeConfig(motor.type);
+    const tempColor = getTemperatureColor(motor.temp);
+    
+    const isSelected = selectedMotors.includes(motor.id);
+    const rowDiv = document.createElement('div');
+    rowDiv.className = `table-row ${isSelected ? 'selected' : ''} ${motor.status === 'OFFLINE' ? 'dimmed' : ''}`;
+    rowDiv.dataset.motorId = motor.id;
+    rowDiv.onclick = () => toggleRowSelection(motor.id);
+    
+    // Checkbox column
+    const checkboxCol = document.createElement('div');
+    checkboxCol.className = 'row-cell checkbox-col';
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.className = 'row-checkbox';
+    checkbox.checked = isSelected;
+    checkbox.onchange = (e) => handleRowCheckbox(motor.id, e.target.checked);
+    checkboxCol.appendChild(checkbox);
+    
+    // ID column
+    const idCol = document.createElement('div');
+    idCol.className = 'row-cell id-col';
+    const dragHandle = document.createElement('span');
+    dragHandle.className = 'drag-handle';
+    dragHandle.draggable = true;
+    dragHandle.textContent = '⠿';
+    const motorIdSpan = document.createElement('span');
+    motorIdSpan.className = 'motor-id';
+    motorIdSpan.textContent = motor.id;
+    idCol.appendChild(dragHandle);
+    idCol.appendChild(motorIdSpan);
+    
+    // Motor info column
+    const motorCol = document.createElement('div');
+    motorCol.className = 'row-cell motor-col';
+    const motorAvatar = document.createElement('div');
+    motorAvatar.className = 'motor-avatar';
+    const motorIcon = document.createElement('span');
+    motorIcon.className = 'motor-icon';
+    motorIcon.textContent = '🏍️';
+    motorAvatar.appendChild(motorIcon);
+    
+    const motorInfo = document.createElement('div');
+    motorInfo.className = 'motor-info';
+    const motorName = document.createElement('div');
+    motorName.className = 'motor-name';
+    motorName.textContent = motor.name;
+    const motorSerial = document.createElement('div');
+    motorSerial.className = 'motor-serial';
+    motorSerial.textContent = `SN: ${motor.serial}`;
+    motorInfo.appendChild(motorName);
+    motorInfo.appendChild(motorSerial);
+    
+    if (motor.type === 'RACING') {
+        const motorTag = document.createElement('div');
+        motorTag.className = 'motor-tag';
+        motorTag.textContent = 'PREMIUM';
+        motorInfo.appendChild(motorTag);
+    }
+    
+    motorCol.appendChild(motorAvatar);
+    motorCol.appendChild(motorInfo);
+    
+    // Type column
+    const typeCol = document.createElement('div');
+    typeCol.className = 'row-cell type-col';
+    const typeBadge = document.createElement('div');
+    typeBadge.className = `type-badge ${motor.type.toLowerCase()}`;
+    typeBadge.style.background = typeConfig.bg;
+    typeBadge.style.borderColor = typeConfig.border;
+    typeBadge.style.color = typeConfig.color;
+    const typeDot = document.createElement('span');
+    typeDot.className = 'type-dot';
+    const typeText = document.createElement('span');
+    typeText.className = 'type-text';
+    typeText.textContent = motor.type;
+    typeBadge.appendChild(typeDot);
+    typeBadge.appendChild(typeText);
+    typeCol.appendChild(typeBadge);
+    
+    // Power column
+    const powerCol = document.createElement('div');
+    powerCol.className = 'row-cell power-col';
+    const powerDisplay = document.createElement('div');
+    powerDisplay.className = 'power-display';
+    const powerValue = document.createElement('span');
+    powerValue.className = 'power-value';
+    powerValue.textContent = motor.power || '--';
+    const powerUnit = document.createElement('span');
+    powerUnit.className = 'power-unit';
+    powerUnit.textContent = 'W';
+    powerDisplay.appendChild(powerValue);
+    powerDisplay.appendChild(powerUnit);
+    
+    const powerBar = document.createElement('div');
+    powerBar.className = 'power-bar';
+    const powerFill = document.createElement('div');
+    powerFill.className = 'power-fill';
+    powerFill.style.width = `${motor.power ? (motor.power / 4000) * 100 : 0}%`;
+    powerBar.appendChild(powerFill);
+    
+    powerCol.appendChild(powerDisplay);
+    powerCol.appendChild(powerBar);
+    
+    // Temperature column
+    const tempCol = document.createElement('div');
+    tempCol.className = 'row-cell temp-col';
+    const tempIcon = document.createElement('span');
+    tempIcon.className = 'temp-icon';
+    tempIcon.style.color = tempColor;
+    tempIcon.textContent = '🌡️';
+    const tempValue = document.createElement('span');
+    tempValue.className = 'temp-value';
+    tempValue.style.color = tempColor;
+    tempValue.textContent = formatTemperature(motor.temp);
+    tempCol.appendChild(tempIcon);
+    tempCol.appendChild(tempValue);
+    
+    if (motor.critical) {
+        const tempWarning = document.createElement('span');
+        tempWarning.className = 'temp-warning';
+        tempWarning.textContent = '⚠️';
+        tempCol.appendChild(tempWarning);
+    }
+    
+    // RPM column
+    const rpmCol = document.createElement('div');
+    rpmCol.className = 'row-cell rpm-col';
+    const rpmDisplay = document.createElement('div');
+    rpmDisplay.className = 'rpm-display';
+    const rpmValue = document.createElement('span');
+    rpmValue.className = 'rpm-value';
+    rpmValue.textContent = formatRPM(motor.rpm);
+    const rpmUnit = document.createElement('span');
+    rpmUnit.className = 'rpm-unit';
+    rpmUnit.textContent = 'RPM';
+    rpmDisplay.appendChild(rpmValue);
+    rpmDisplay.appendChild(rpmUnit);
+    rpmCol.appendChild(rpmDisplay);
+    
+    if (motor.status === 'ONLINE') {
+        const rpmIndicator = document.createElement('div');
+        rpmIndicator.className = 'rpm-indicator pulsing';
+        rpmCol.appendChild(rpmIndicator);
+    }
+    
+    const miniSparkline = document.createElement('div');
+    miniSparkline.className = 'mini-sparkline';
+    rpmCol.appendChild(miniSparkline);
+    
+    // Status column
+    const statusCol = document.createElement('div');
+    statusCol.className = 'row-cell status-col';
+    const statusBadge = document.createElement('div');
+    statusBadge.className = `status-badge ${motor.status.toLowerCase()}`;
+    statusBadge.style.background = statusConfig.bg;
+    statusBadge.style.borderColor = statusConfig.border;
+    
+    const statusIcon = document.createElement('span');
+    statusIcon.className = `status-icon ${statusConfig.pulse ? 'pulsing' : ''}`;
+    statusIcon.style.color = statusConfig.color;
+    statusIcon.textContent = statusConfig.icon;
+    
+    const statusInfo = document.createElement('div');
+    statusInfo.className = 'status-info';
+    const statusText = document.createElement('div');
+    statusText.className = 'status-text';
+    statusText.style.color = statusConfig.color;
+    statusText.textContent = motor.status;
+    const statusTime = document.createElement('div');
+    statusTime.className = 'status-time';
+    statusTime.textContent = motor.lastSeen;
+    statusInfo.appendChild(statusText);
+    statusInfo.appendChild(statusTime);
+    
+    statusBadge.appendChild(statusIcon);
+    statusBadge.appendChild(statusInfo);
+    statusCol.appendChild(statusBadge);
+    
+    // Date column
+    const dateCol = document.createElement('div');
+    dateCol.className = 'row-cell date-col';
+    const dateIcon = document.createElement('span');
+    dateIcon.className = 'date-icon';
+    dateIcon.textContent = '📅';
+    const dateInfo = document.createElement('div');
+    dateInfo.className = 'date-info';
+    const dateValue = document.createElement('div');
+    dateValue.className = 'date-value';
+    dateValue.textContent = motor.created.split(' ')[0];
+    const timeValue = document.createElement('div');
+    timeValue.className = 'time-value';
+    timeValue.textContent = motor.created.split(' ')[1];
+    dateInfo.appendChild(dateValue);
+    dateInfo.appendChild(timeValue);
+    dateCol.appendChild(dateIcon);
+    dateCol.appendChild(dateInfo);
+    
+    // Actions column
+    const actionsCol = document.createElement('div');
+    actionsCol.className = 'row-cell actions-col';
+    const actionButtons = document.createElement('div');
+    actionButtons.className = 'action-buttons';
+    
+    const actions = [
+        { class: 'view', icon: '👁️', title: 'Ver detalhes', handler: () => viewMotor(motor.id) },
+        { class: 'edit', icon: '✏️', title: 'Editar motor', handler: () => editMotor(motor.id) },
+        { class: 'chart', icon: '📊', title: 'Ver métricas', handler: () => showCharts(motor.id) },
+        { class: 'link', icon: '🔗', title: 'Vincular sensor', handler: () => linkSensor(motor.id) },
+        { class: 'delete', icon: '🗑️', title: 'Deletar motor', handler: () => deleteMotor(motor.id) }
+    ];
+    
+    actions.forEach(action => {
+        const btn = document.createElement('button');
+        btn.className = `action-btn ${action.class}`;
+        btn.title = action.title;
+        btn.onclick = action.handler;
+        const icon = document.createElement('span');
+        icon.className = 'btn-icon';
+        icon.textContent = action.icon;
+        btn.appendChild(icon);
+        actionButtons.appendChild(btn);
+    });
+    
+    actionsCol.appendChild(actionButtons);
+    
+    // Append all columns to row
+    rowDiv.appendChild(checkboxCol);
+    rowDiv.appendChild(idCol);
+    rowDiv.appendChild(motorCol);
+    rowDiv.appendChild(typeCol);
+    rowDiv.appendChild(powerCol);
+    rowDiv.appendChild(tempCol);
+    rowDiv.appendChild(rpmCol);
+    rowDiv.appendChild(statusCol);
+    rowDiv.appendChild(dateCol);
+    rowDiv.appendChild(actionsCol);
+    
+    return rowDiv;
+}
+
 function renderTableRow(motor, index) {
     const statusConfig = getStatusConfig(motor.status);
     const typeConfig = getTypeConfig(motor.type);
@@ -414,71 +657,8 @@ function renderTableRow(motor, index) {
 }
 
 function renderExpandedRow(motor) {
-    return `
-        <div class="expanded-row" data-motor-id="${motor.id}">
-            <div class="expanded-content">
-                <div class="expanded-col sensors">
-                    <h4 class="expanded-title">SENSORES VINCULADOS</h4>
-                    <div class="sensor-list">
-                        <div class="sensor-item">
-                            <span class="sensor-icon">🌡️</span>
-                            <span class="sensor-type">Temperatura:</span>
-                            <span class="sensor-value">${formatTemperature(motor.temp)}</span>
-                        </div>
-                        <div class="sensor-item">
-                            <span class="sensor-icon">⚡</span>
-                            <span class="sensor-type">Potência:</span>
-                            <span class="sensor-value">${formatPower(motor.power)}</span>
-                        </div>
-                        <div class="sensor-item">
-                            <span class="sensor-icon">🔄</span>
-                            <span class="sensor-type">RPM:</span>
-                            <span class="sensor-value">${formatRPM(motor.rpm)}</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="expanded-col charts">
-                    <h4 class="expanded-title">MINI GRÁFICOS</h4>
-                    <div class="mini-chart rpm-chart">
-                        <div class="chart-title">RPM (Última Hora)</div>
-                        <div class="chart-placeholder">📈</div>
-                    </div>
-                    <div class="mini-chart power-chart">
-                        <div class="chart-title">Consumo de Energia</div>
-                        <div class="chart-placeholder">📊</div>
-                    </div>
-                </div>
-                
-                <div class="expanded-col actions">
-                    <h4 class="expanded-title">AÇÕES RÁPIDAS</h4>
-                    <div class="quick-actions">
-                        <button class="quick-action-btn">
-                            <span class="btn-icon">⚙️</span>
-                            <span class="btn-text">Configurar</span>
-                        </button>
-                        <button class="quick-action-btn">
-                            <span class="btn-icon">📊</span>
-                            <span class="btn-text">Relatório</span>
-                        </button>
-                        <button class="quick-action-btn">
-                            <span class="btn-icon">🔧</span>
-                            <span class="btn-text">Manutenção</span>
-                        </button>
-                        <button class="quick-action-btn">
-                            <span class="btn-icon">📜</span>
-                            <span class="btn-text">Histórico</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-            
-            <button class="collapse-btn" onclick="collapseRow('${motor.id}')">
-                <span class="btn-icon">△</span>
-                <span class="btn-text">FECHAR</span>
-            </button>
-        </div>
-    `;
+    // This function is deprecated - expanded rows should be created safely with DOM methods
+    return null;
 }
 
 function renderTable() {
@@ -520,8 +700,12 @@ function renderTable() {
     const endIndex = startIndex + rowsPerPage;
     const paginatedMotors = filteredMotors.slice(startIndex, endIndex);
     
-    // Render rows
-    tableBody.innerHTML = paginatedMotors.map((motor, index) => renderTableRow(motor, index)).join('');
+    // Render rows - XSS Safe
+    tableBody.textContent = '';
+    paginatedMotors.forEach((motor, index) => {
+        const rowElement = createTableRowElement(motor, index);
+        tableBody.appendChild(rowElement);
+    });
     
     // Update pagination info
     updatePaginationInfo(filteredMotors.length);
@@ -650,7 +834,49 @@ function updatePaginationButtons(totalPages) {
         }
     }
     
-    pageNumbers.innerHTML = paginationHTML;
+    // XSS Safe pagination
+    pageNumbers.textContent = '';
+    const paginationFragment = document.createDocumentFragment();
+    
+    // Create pagination buttons safely
+    const createPageButton = (pageNum, isActive) => {
+        const btn = document.createElement('button');
+        btn.className = `page-number ${isActive ? 'active' : ''}`;
+        btn.textContent = pageNum;
+        btn.onclick = () => goToPage(pageNum);
+        return btn;
+    };
+    
+    // Always show first page
+    paginationFragment.appendChild(createPageButton(1, currentPage === 1));
+    
+    if (totalPages > 1) {
+        if (currentPage > 3) {
+            const ellipsis = document.createElement('span');
+            ellipsis.className = 'page-ellipsis';
+            ellipsis.textContent = '...';
+            paginationFragment.appendChild(ellipsis);
+        }
+        
+        // Show pages around current page
+        for (let i = Math.max(2, currentPage - 1); i <= Math.min(totalPages - 1, currentPage + 1); i++) {
+            paginationFragment.appendChild(createPageButton(i, currentPage === i));
+        }
+        
+        if (currentPage < totalPages - 2) {
+            const ellipsis = document.createElement('span');
+            ellipsis.className = 'page-ellipsis';
+            ellipsis.textContent = '...';
+            paginationFragment.appendChild(ellipsis);
+        }
+        
+        // Always show last page
+        if (totalPages > 1) {
+            paginationFragment.appendChild(createPageButton(totalPages, currentPage === totalPages));
+        }
+    }
+    
+    pageNumbers.appendChild(paginationFragment);
 }
 
 // ━━━ ACTION FUNCTIONS ━━━
@@ -783,12 +1009,24 @@ function renderFilters() {
     const filtersContainer = document.querySelector('.quick-filters');
     if (!filtersContainer) return;
     
-    filtersContainer.innerHTML = activeFilters.map(filter => `
-        <div class="filter-tag active">
-            <span>${filter}</span>
-            <button class="remove-filter" onclick="removeFilter('${filter}')">✕</button>
-        </div>
-    `).join('');
+    // XSS Safe filter rendering
+    filtersContainer.textContent = '';
+    activeFilters.forEach(filter => {
+        const filterDiv = document.createElement('div');
+        filterDiv.className = 'filter-tag active';
+        
+        const span = document.createElement('span');
+        span.textContent = filter;
+        
+        const button = document.createElement('button');
+        button.className = 'remove-filter';
+        button.textContent = '✕';
+        button.onclick = () => removeFilter(filter);
+        
+        filterDiv.appendChild(span);
+        filterDiv.appendChild(button);
+        filtersContainer.appendChild(filterDiv);
+    });
 }
 
 // ━━━ INITIALIZATION ━━━

@@ -1,4 +1,3 @@
-from django.db import models
 from .models import Motor, Sensor, DadosSensor, SensorMotor
 
 class BaseRepository:
@@ -12,21 +11,21 @@ class BaseRepository:
         """Override in subclasses for optimized queries"""
         return self.get_all()
 
-    def get_by_id(self, id):
-        return self.model.objects.get(id=id)
+    def get_by_id(self, obj_id):
+        return self.model.objects.get(id=obj_id)
 
     def create(self, **kwargs):
         return self.model.objects.create(**kwargs)
 
-    def update(self, id, **kwargs):
-        obj = self.get_by_id(id)
+    def update(self, obj_id, **kwargs):
+        obj = self.get_by_id(obj_id)
         for key, value in kwargs.items():
             setattr(obj, key, value)
         obj.save()
         return obj
 
-    def delete(self, id):
-        obj = self.get_by_id(id)
+    def delete(self, obj_id):
+        obj = self.get_by_id(obj_id)
         obj.delete()
 
 class MotorRepository(BaseRepository):

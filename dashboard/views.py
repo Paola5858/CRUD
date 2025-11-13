@@ -1,8 +1,8 @@
 from django.shortcuts import render
-from django.db.models import Count, Avg, Sum, Q
+from django.db.models import Avg, Sum, Q
 from django.db.models.functions import TruncMonth, TruncDay
 from django.utils import timezone
-from datetime import timedelta
+from datetime import timedelta, datetime
 from django.contrib.auth.decorators import login_required
 from sensores.models import Motor, Sensor, DadosSensor, SensorMotor
 import json

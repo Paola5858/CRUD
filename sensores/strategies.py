@@ -2,10 +2,9 @@ from abc import ABC, abstractmethod
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-from django.utils.decorators import method_decorator
-from .services import MotorService, SensorService, DadosSensorService
-from .forms import MotorForm, SensorForm, DadosForm
+from django.urls import reverse
+from .services import SensorService, DadosSensorService
+from .forms import SensorForm, DadosForm
 import json
 
 class CrudStrategy(ABC):
@@ -125,7 +124,8 @@ class CreateStrategy(CrudStrategy):
                         })
                     else:
                         messages.success(request, 'Criado com sucesso!')
-                        return redirect(request.path)
+                        # Use safe redirect to list view instead of request.path
+                        return redirect(reverse('sensores:listar'))
                         
                 except Exception as e:
                     if is_ajax:
@@ -171,7 +171,8 @@ class UpdateStrategy(CrudStrategy):
                         })
                     else:
                         messages.success(request, 'Atualizado com sucesso!')
-                        return redirect(request.path)
+                        # Use safe redirect to list view instead of request.path
+                        return redirect(reverse('sensores:listar'))
                         
                 except Exception as e:
                     if is_ajax:
@@ -210,7 +211,8 @@ class DeleteStrategy(CrudStrategy):
                     })
                 else:
                     messages.success(request, 'Deletado com sucesso!')
-                    return redirect(request.path)
+                    # Use safe redirect to list view instead of request.path
+                    return redirect(reverse('sensores:listar'))
                     
             except Exception as e:
                 if is_ajax:

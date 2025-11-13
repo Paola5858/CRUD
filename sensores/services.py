@@ -7,17 +7,17 @@ class BaseService:
     def list_all(self):
         return self.repository.get_all_optimized()
 
-    def get_by_id(self, id):
-        return self.repository.get_by_id(id)
+    def get_by_id(self, obj_id):
+        return self.repository.get_by_id(obj_id)
 
     def create(self, data):
         return self.repository.create(**data)
 
-    def update(self, id, data):
-        return self.repository.update(id, **data)
+    def update(self, obj_id, data):
+        return self.repository.update(obj_id, **data)
 
-    def delete(self, id):
-        self.repository.delete(id)
+    def delete(self, obj_id):
+        self.repository.delete(obj_id)
 
 class MotorService(BaseService):
     def __init__(self):

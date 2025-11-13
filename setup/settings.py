@@ -25,23 +25,28 @@ except ImportError:
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv('SECRET_KEY')
-if not SECRET_KEY:
-    if os.getenv('DJANGO_ENV') == 'production':
-        raise ValueError('SECRET_KEY deve ser definida em produção!')
-    SECRET_KEY = 'django-insecure-dev-only-key-never-use-in-production'
-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', 'True').lower() in ('true', '1', 'yes')
 
-# Hosts permitidos
-hosts_env = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1,0.0.0.0')
-ALLOWED_HOSTS = [host.strip() for host in hosts_env.split(',') if host.strip()]
+# SECURITY WARNING: keep the secret key used in production secret!
+# A chave secreta é carregada a partir das variáveis de ambiente.
+# Garanta que a variável de ambiente SECRET_KEY está definida.
+SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-dev-only-key-never-use-in-production')
 
-# Garantir que sempre há hosts em desenvolvimento
-if DEBUG and not ALLOWED_HOSTS:
-    ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0']
+if not SECRET_KEY or SECRET_KEY == 'django-insecure-dev-only-key-never-use-in-production':
+    if not DEBUG:
+        raise ValueError("A variável de ambiente SECRET_KEY não está definida ou está usando valor inseguro. "
+                         "Configure uma chave segura para produção.")
+
+# Hosts permitidos
+hosts_env = os.getenv('ALLOWED_HOSTS', '')
+if hosts_env:
+    ALLOWED_HOSTS = [host.strip() for host in hosts_env.split(',') if host.strip()]
+else:
+    if DEBUG:
+        ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+    else:
+        raise ValueError("ALLOWED_HOSTS deve ser definido para produção no arquivo .env")
 
 
 # Application definition
@@ -195,6 +200,7 @@ except ImportError:
 
 # Configurações de segurança para produção
 if not DEBUG:
+    SECURE_SSL_REDIRECT = True
     SECURE_BROWSER_XSS_FILTER = True
     SECURE_CONTENT_TYPE_NOSNIFF = True
     SECURE_HSTS_SECONDS = 31536000
