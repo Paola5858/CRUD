@@ -7,10 +7,11 @@ from .services import DadosSensorService
 from .forms import DadosForm
 
 class CrudStrategy(ABC):
-    def __init__(self, service, form_class, template_name):
+    def __init__(self, service, form_class, template_name, list_url_name=None):
         self.service = service
         self.form_class = form_class
         self.template_name = template_name
+        self.list_url_name = list_url_name
 
     @abstractmethod
     def handle_request(self, request, *args, **kwargs):
@@ -124,7 +125,7 @@ class CreateStrategy(CrudStrategy):
                     else:
                         messages.success(request, 'Criado com sucesso!')
                         # Use safe redirect to list view instead of request.path
-                        return redirect(reverse('sensores:listar'))
+                        return redirect(reverse(self.list_url_name))
                         
                 except Exception as e:
                     if is_ajax:
@@ -148,8 +149,9 @@ class CreateStrategy(CrudStrategy):
         return render(request, self.template_name, {'form': form})
 
 class UpdateStrategy(CrudStrategy):
-    def handle_request(self, request, id, *args, **kwargs):
-        obj = get_object_or_404(self.service.repository.model, id=id)
+    def handle_request(self, request, *args, **kwargs):
+        pk = kwargs.get('pk')
+        obj = get_object_or_404(self.service.repository.model, id=pk)
         
         if request.method == 'POST':
             is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
@@ -157,21 +159,21 @@ class UpdateStrategy(CrudStrategy):
             form = self.form_class(request.POST, instance=obj)
             if form.is_valid():
                 try:
-                    updated_obj = self.service.update(id, form.cleaned_data)
+                    updated_obj = self.service.update(pk, form.cleaned_data)
                     
                     if is_ajax:
                         return JsonResponse({
                             'success': True,
                             'message': 'Atualizado com sucesso!',
                             'data': {
-                                'id': updated_obj.id if hasattr(updated_obj, 'id') else id,
+                                'id': updated_obj.id if hasattr(updated_obj, 'id') else pk,
                                 'nome': getattr(updated_obj, 'nome', str(updated_obj))
                             }
                         })
                     else:
                         messages.success(request, 'Atualizado com sucesso!')
                         # Use safe redirect to list view instead of request.path
-                        return redirect(reverse('sensores:listar'))
+                        return redirect(reverse(self.list_url_name))
                         
                 except Exception as e:
                     if is_ajax:
@@ -194,14 +196,15 @@ class UpdateStrategy(CrudStrategy):
         return render(request, self.template_name, {'form': form, 'object': obj})
 
 class DeleteStrategy(CrudStrategy):
-    def handle_request(self, request, id, *args, **kwargs):
-        obj = get_object_or_404(self.service.repository.model, id=id)
+    def handle_request(self, request, *args, **kwargs):
+        pk = kwargs.get('pk')
+        obj = get_object_or_404(self.service.repository.model, id=pk)
         
         if request.method == 'POST':
             is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
             
             try:
-                self.service.delete(id)
+                self.service.delete(pk)
                 
                 if is_ajax:
                     return JsonResponse({
@@ -211,7 +214,7 @@ class DeleteStrategy(CrudStrategy):
                 else:
                     messages.success(request, 'Deletado com sucesso!')
                     # Use safe redirect to list view instead of request.path
-                    return redirect(reverse('sensores:listar'))
+                    return redirect(reverse(self.list_url_name))
                     
             except Exception as e:
                 if is_ajax:

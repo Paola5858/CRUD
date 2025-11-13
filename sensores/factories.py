@@ -1,6 +1,6 @@
 from .strategies import ListStrategy, CreateStrategy, UpdateStrategy, DeleteStrategy
-from .services import MotorService, DadosSensorService, SensorMotorService
-from .forms import MotorForm, DadosForm, SensorMotorForm
+from .services import MotorService, SensorService, DadosSensorService, SensorMotorService
+from .forms import MotorForm, SensorForm, DadosForm, SensorMotorForm
 import logging
 
 logger = logging.getLogger(__name__)
@@ -12,18 +12,22 @@ class CrudFactory:
             service = MotorService()
             form_class = MotorForm
             template_base = 'sensores/motor'
+            list_url_name = 'sensores:listar_motor'
         elif model_name == 'sensor':
-            # Sensor functionality removed
-            logger.error(f"Modelo sensor não suportado: {model_name}")
-            raise ValueError(f"Modelo sensor não suportado: {model_name}")
+            service = SensorService()
+            form_class = SensorForm
+            template_base = 'sensores/sensor'
+            list_url_name = 'sensores:listar_sensor'
         elif model_name == 'dados':
             service = DadosSensorService()
             form_class = DadosForm
             template_base = 'sensores/dadossensor'
+            list_url_name = 'sensores:listar_dados'
         elif model_name == 'sensormotor':
             service = SensorMotorService()
             form_class = SensorMotorForm
             template_base = 'sensores/sensormotor'
+            list_url_name = 'sensores:listar_sensormotor'
         else:
             logger.error(f"Modelo inválido: {model_name}")
             raise ValueError(f"Modelo inválido: {model_name}")
@@ -32,8 +36,7 @@ class CrudFactory:
             if model_name == 'motor':
                 return ListStrategy(service, form_class, 'sensores/listar_motor.html')
             elif model_name == 'sensor':
-                # Sensor functionality removed
-                raise ValueError(f"Modelo sensor não suportado: {model_name}")
+                return ListStrategy(service, form_class, 'sensores/listar_sensor.html')
             elif model_name == 'dados':
                 return ListStrategy(service, form_class, 'sensores/listar_dados.html')
             elif model_name == 'sensormotor':
@@ -42,25 +45,25 @@ class CrudFactory:
                 return ListStrategy(service, form_class, f'{template_base}_list.html')
         elif action == 'create':
             if model_name == 'dados':
-                return CreateStrategy(service, form_class, 'sensores/dadossensor_form.html')
+                return CreateStrategy(service, form_class, 'sensores/dadossensor_form.html', list_url_name)
             elif model_name == 'sensormotor':
-                return CreateStrategy(service, form_class, 'sensores/sensormotor_form.html')
+                return CreateStrategy(service, form_class, 'sensores/sensormotor_form.html', list_url_name)
             else:
-                return CreateStrategy(service, form_class, f'{template_base}_form.html')
+                return CreateStrategy(service, form_class, f'{template_base}_form.html', list_url_name)
         elif action == 'update':
             if model_name == 'dados':
-                return UpdateStrategy(service, form_class, 'sensores/dadossensor_form.html')
+                return UpdateStrategy(service, form_class, 'sensores/dadossensor_form.html', list_url_name)
             elif model_name == 'sensormotor':
-                return UpdateStrategy(service, form_class, 'sensores/sensormotor_form.html')
+                return UpdateStrategy(service, form_class, 'sensores/sensormotor_form.html', list_url_name)
             else:
-                return UpdateStrategy(service, form_class, f'{template_base}_form.html')
+                return UpdateStrategy(service, form_class, f'{template_base}_form.html', list_url_name)
         elif action == 'delete':
             if model_name == 'dados':
-                return DeleteStrategy(service, form_class, 'sensores/dadossensor_confirm_delete.html')
+                return DeleteStrategy(service, form_class, 'sensores/dadossensor_confirm_delete.html', list_url_name)
             elif model_name == 'sensormotor':
-                return DeleteStrategy(service, form_class, 'sensores/sensormotor_confirm_delete.html')
+                return DeleteStrategy(service, form_class, 'sensores/sensormotor_confirm_delete.html', list_url_name)
             else:
-                return DeleteStrategy(service, form_class, f'{template_base}_confirm_delete.html')
+                return DeleteStrategy(service, form_class, f'{template_base}_confirm_delete.html', list_url_name)
         else:
             logger.error(f"Ação inválida: {action}")
             raise ValueError(f"Ação inválida: {action}")

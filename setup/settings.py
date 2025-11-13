@@ -46,9 +46,11 @@ if hosts_env:
         for host in hosts_env.split(",")
         if host.strip() and host.strip() != "0.0.0.0"
     ]
+    if DEBUG:
+        ALLOWED_HOSTS.append('testserver')
 else:
     if DEBUG:
-        ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+        ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'testserver']
     else:
         raise ValueError("ALLOWED_HOSTS deve ser definido para produção no arquivo .env")
 

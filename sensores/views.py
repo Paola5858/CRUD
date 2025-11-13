@@ -1,6 +1,6 @@
 from django.views import View
 from django.shortcuts import render
-from django.http import Http404
+from django.http import Http404, JsonResponse
 from django.contrib import messages
 from django.db import IntegrityError
 from django.contrib.auth.decorators import login_required
@@ -11,6 +11,13 @@ from .factories import CrudFactory
 from .models import Motor, Sensor, SensorMotor, DadosSensor
 
 logger = logging.getLogger(__name__)
+
+def welcome_api(request):
+    """
+    API endpoint that logs requests and returns a welcome message.
+    """
+    logger.info(f"Request received: {request.method} {request.path}")
+    return JsonResponse({"message": "Welcome to the MOTOSENSE API Service!"})
 
 @login_required
 def dashboard(request):

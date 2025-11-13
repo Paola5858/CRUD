@@ -24,6 +24,7 @@ urlpatterns = [
     path('', include('sensores.urls')),
     path('dashboard/', include('dashboard.urls')),
     path('', include('usuarios.urls')),
+    path('api/', include('sensores.urls', namespace='api')),
 ]
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATICFILES_DIRS[0])
