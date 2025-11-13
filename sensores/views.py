@@ -3,6 +3,8 @@ from django.shortcuts import render
 from django.http import Http404
 from django.contrib import messages
 from django.db import IntegrityError
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 import logging
 import json
 from .factories import CrudFactory
@@ -10,6 +12,7 @@ from .models import Motor, Sensor, SensorMotor, DadosSensor
 
 logger = logging.getLogger(__name__)
 
+@login_required
 def dashboard(request):
     total_motores = Motor.objects.count()
     total_sensores = Sensor.objects.count()
@@ -29,7 +32,7 @@ def dashboard(request):
     }
     return render(request, 'sensores/dashboard.html', context)
 
-class CrudView(View):
+class CrudView(LoginRequiredMixin, View):
     model_name = None
     action = None
 

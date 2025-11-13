@@ -293,6 +293,35 @@
     display: flex;
     align-items: center;
     gap: 12px;
+    margin-bottom: 12px;
+}
+
+.user-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+}
+
+.user-action {
+    width: 36px;
+    height: 36px;
+    background: rgba(255, 107, 0, 0.1);
+    border: 1px solid rgba(255, 107, 0, 0.3);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    color: #ff6b00;
+    font-size: 16px;
+    transition: all 0.3s ease;
+}
+
+.user-action:hover {
+    background: rgba(255, 107, 0, 0.2);
+    border-color: #ff6b00;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 107, 0, 0.3);
 }
 
 .user-avatar {

@@ -3,6 +3,7 @@ from django.db.models import Count, Avg, Sum, Q
 from django.db.models.functions import TruncMonth, TruncDay
 from django.utils import timezone
 from datetime import timedelta
+from django.contrib.auth.decorators import login_required
 from sensores.models import Motor, Sensor, DadosSensor, SensorMotor
 import json
 
@@ -87,6 +88,7 @@ def calculate_growth_rate():
         return round(((leituras_mes_atual - leituras_mes_anterior) / leituras_mes_anterior) * 100, 1)
     return 0  # Retorna 0 se não houver dados anteriores
 
+@login_required
 def dashboard_view(request):
     """Dashboard com dados reais usando QuerySet conforme requisito"""
     

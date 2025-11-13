@@ -1,0 +1,21 @@
+{% extends 'base_optimized.html' %}
+
+{% block content %}
+<div style="padding: 40px;">
+    <h1>Perfil do Usuário</h1>
+    <div style="background: #1a1a1a; padding: 30px; border-radius: 12px; margin-top: 20px;">
+        <p><strong>Usuário:</strong> {{ user.username }}</p>
+        <p><strong>Nome:</strong> {{ user.first_name }} {{ user.last_name }}</p>
+        <p><strong>Email:</strong> {{ user.email }}</p>
+        
+        <div style="margin-top: 30px;">
+            <a href="{% url 'editar_perfil' %}" style="background: #ff6b00; padding: 12px 24px; border-radius: 8px; color: #000; text-decoration: none; font-weight: 700;">
+                Editar Perfil
+            </a>
+            <a href="{% url 'logout' %}" style="background: #333; padding: 12px 24px; border-radius: 8px; color: #fff; text-decoration: none; margin-left: 10px;">
+                Sair
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -50,11 +50,19 @@
             </nav>
             <div class="sidebar-footer">
                 <div class="user-profile">
-                    <div class="user-avatar">A</div>
+                    <div class="user-avatar">{{ user.first_name.0|default:user.username.0|upper }}</div>
                     <div class="user-info">
-                        <div class="user-name">Admin</div>
-                        <div class="user-role">Superuser</div>
+                        <div class="user-name">{{ user.first_name|default:user.username }}</div>
+                        <div class="user-role">{{ user.groups.first.name|default:"Usuário" }}</div>
                     </div>
+                </div>
+                <div class="user-actions">
+                    <a href="{% url 'profile' %}" class="user-action" title="Perfil">
+                        <span>👤</span>
+                    </a>
+                    <a href="{% url 'logout' %}" class="user-action" title="Sair">
+                        <span>🚪</span>
+                    </a>
                 </div>
             </div>
         </aside>
