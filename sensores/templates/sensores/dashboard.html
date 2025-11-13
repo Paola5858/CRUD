@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard</title>
+</head>
+<body>
+    <h1>Dashboard de Sensores</h1>
+    <h2>Resumo</h2>
+    <ul>
+        <li>Total de Motores: {{ total_motores }}</li>
+        <li>Total de Sensores: {{ total_sensores }}</li>
+        <li>Total de Relações Sensor-Motor: {{ total_sensor_motor }}</li>
+    </ul>
+    <h2>Últimos 10 Registros de Dados do Sensor</h2>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Data/Hora</th>
+                <th>Sensor</th>
+                <th>Motor</th>
+                <th>Valor</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for dado in ultimos_dados %}
+            <tr>
+                <td>{{ dado.data_hora }}</td>
+                <td>{{ dado.sensor.tipo }}</td>
+                <td>{{ dado.motor.nome }}</td>
+                <td>{{ dado.valor }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4">Nenhum dado encontrado.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>
