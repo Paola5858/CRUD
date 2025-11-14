@@ -1,0 +1,96 @@
+version: '3.8'
+
+services:
+  db:
+    image: mysql:8.0
+    container_name: motosense_db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ctrlmotordb
+      MYSQL_USER: motosense
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./docker/mysql/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "3306:3306"
+    networks:
+      - motosense_network
+
+  redis:
+    image: redis:7-alpine
+    container_name: motosense_redis
+    restart: unless-stopped
+    volumes:
+      - redis_data:/data
+    networks:
+      - motosense_network
+
+  web:
+    build: .
+    container_name: motosense_web
+    restart: unless-stopped
+    environment:
+      - DEBUG=False
+      - DB_HOST=db
+      - DB_NAME=ctrlmotordb
+      - DB_USER=motosense
+      - DB_PASSWORD=${DB_PASSWORD}
+      - REDIS_URL=redis://redis:6379/1
+    volumes:
+      - ./logs:/app/logs
+      - static_volume:/app/staticfiles
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+      - redis
+    networks:
+      - motosense_network
+
+  worker:
+    build: .
+    container_name: motosense_worker
+    restart: unless-stopped
+    command: python worker.py
+    environment:
+      - DB_HOST=db
+      - DB_NAME=ctrlmotordb
+      - DB_USER=motosense
+      - DB_PASSWORD=${DB_PASSWORD}
+      - MQTT_BROKER=${MQTT_BROKER}
+      - MQTT_USERNAME=${MQTT_USERNAME}
+      - MQTT_PASSWORD=${MQTT_PASSWORD}
+    volumes:
+      - ./logs:/app/logs
+    depends_on:
+      - db
+      - redis
+    networks:
+      - motosense_network
+
+  nginx:
+    image: nginx:alpine
+    container_name: motosense_nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf
+      - static_volume:/app/staticfiles
+      - ./docker/nginx/ssl:/etc/nginx/ssl
+    depends_on:
+      - web
+    networks:
+      - motosense_network
+
+volumes:
+  mysql_data:
+  redis_data:
+  static_volume:
+
+networks:
+  motosense_network:
+    driver: bridge
