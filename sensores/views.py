@@ -75,9 +75,10 @@ class DeletarMotorView(CrudView):
     model_name = 'motor'
     action = 'delete'
 
-class ListarSensorView(CrudView):
-    model_name = 'sensor'
-    action = 'list'
+class ListarSensorView(LoginRequiredMixin, View):
+    def get(self, request):
+        sensores = Sensor.objects.all()
+        return render(request, 'sensores/listar_sensor.html', {'objects': sensores})
 
 class CriarSensorView(CrudView):
     model_name = 'sensor'
