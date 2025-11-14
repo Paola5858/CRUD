@@ -111,26 +111,37 @@ python worker.py
 
 ### Variáveis de Ambiente (.env)
 
-```bash
-# Django
-SECRET_KEY=sua-chave-super-secreta-aqui
-DEBUG=False
-ALLOWED_HOSTS=localhost,127.0.0.1,seu-dominio.com
+Copie o arquivo `.env.example` para `.env` e configure suas credenciais:
 
-# Database
+```bash
+cp .env.example .env
+# Edite .env com suas credenciais reais
+```
+
+**Conteúdo do .env:**
+
+```bash
+# Django Configuration
+SECRET_KEY=your-super-secret-key-here-50-characters-minimum
+DEBUG=True
+ALLOWED_HOSTS=localhost,127.0.0.1,testserver
+
+# Database Configuration
 DB_NAME=ctrlmotordb
 DB_USER=root
-DB_PASSWORD=sua-senha-mysql
+DB_PASSWORD=your-mysql-password-here
 DB_HOST=localhost
 DB_PORT=3306
 
-# MQTT CloudAMQP
+# MQTT CloudAMQP Configuration (OBRIGATÓRIO)
 MQTT_BROKER=leopard.lmq.cloudamqp.com
 MQTT_PORT=1883
 MQTT_TOPIC=dadosSensor
-MQTT_USERNAME=seu-usuario
-MQTT_PASSWORD=sua-senha
+MQTT_USERNAME=your-cloudamqp-username-here
+MQTT_PASSWORD=your-cloudamqp-password-here
 ```
+
+**⚠️ IMPORTANTE:** As credenciais MQTT são obrigatórias. O worker.py falhará se não estiverem configuradas.
 
 ### Formato JSON Esperado do ESP32/Arduino
 
@@ -266,23 +277,27 @@ MQTT_PASSWORD=senha-cloudamqp
 ESP32/Sensor → MQTT Broker → Worker Python → MySQL → Django → Dashboard Web
 ```
 
+### Desenvolvimento
+
+Para instruções detalhadas de configuração e contribuição, consulte:
+
+- [CONTRIBUTING.md](CONTRIBUTING.md) - Guia completo para desenvolvedores
+- [SECURITY_FIXES.md](SECURITY_FIXES.md) - Correções de segurança implementadas
+- [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md) - Plano de implementação
+
 ---
 
 ## 🤝 Contribuindo
 
+Consulte o [CONTRIBUTING.md](CONTRIBUTING.md) para diretrizes completas de contribuição.
+
+### Processo Rápido
+
 1. Fork o projeto
 2. Crie sua feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit suas mudanças (`git commit -m 'Add: nova funcionalidade'`)
+3. Commit suas mudanças (`git commit -m 'feat: nova funcionalidade'`)
 4. Push para a branch (`git push origin feature/AmazingFeature`)
 5. Abra um Pull Request
-
-### Diretrizes
-
-- Sempre valide entrada do usuário
-- Use métodos seguros (evite `innerHTML`)
-- Teste contra vulnerabilidades
-- Mantenha dependências atualizadas
-- Documente código complexo
 
 ---
 

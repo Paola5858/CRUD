@@ -972,8 +972,8 @@ function handleNewMotorSubmit(event) {
         serial: `${formData.get('tipo').substring(0, 3).toUpperCase()}-2025-${String(currentMotors.length + 1).padStart(2, '0')}-A`,
         type: formData.get('tipo'),
         power: parseInt(formData.get('potencia')),
-        temp: Math.floor(Math.random() * 40 + 60), // Random temp 60-100
-        rpm: Math.floor(Math.random() * 2000 + 2000), // Random RPM 2000-4000
+        temp: Math.floor(crypto.getRandomValues(new Uint32Array(1))[0] / (0xFFFFFFFF / 40)) + 60, // Secure random temp 60-100
+        rpm: Math.floor(crypto.getRandomValues(new Uint32Array(1))[0] / (0xFFFFFFFF / 2000)) + 2000, // Secure random RPM 2000-4000
         status: 'ONLINE',
         lastSeen: 'Há poucos segundos',
         created: new Date().toLocaleDateString('pt-BR') + ' ' + new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),

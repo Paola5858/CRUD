@@ -26,11 +26,15 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # ========== CONFIGURAÇÕES MQTT (CLOUDAMQP) ==========
-BROKER = "leopard.lmq.cloudamqp.com"
-PORT = 1883
-TOPIC = "dadosSensor"
-USERNAME = "idoufayf:idoufayf"
-PASSWORD = "DpH2tqSXK2l4s3tx5DNr3_ppS9aYGTis"
+BROKER = os.getenv('MQTT_BROKER')
+PORT = int(os.getenv('MQTT_PORT', 1883))
+TOPIC = os.getenv('MQTT_TOPIC', 'dadosSensor')
+USERNAME = os.getenv('MQTT_USERNAME')
+PASSWORD = os.getenv('MQTT_PASSWORD')
+
+# Validar credenciais obrigatórias
+if not BROKER or not USERNAME or not PASSWORD:
+    raise ValueError("Credenciais MQTT obrigatórias não encontradas. Configure MQTT_BROKER, MQTT_USERNAME e MQTT_PASSWORD no arquivo .env")
 CLIENT_ID = "motosense_worker_001"  # ID único - MANTER APENAS 1 WORKER RODANDO!
 
 # ========== VARIÁVEIS GLOBAIS ==========

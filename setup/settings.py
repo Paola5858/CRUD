@@ -272,8 +272,8 @@ LOGGING = {
     },
 }
 
-# Login/Logout URLs
-LOGIN_URL = '/login/'
+# Login/Logout URLs - Constants to avoid duplication
+LOGIN_PATH = '/login/'
+LOGIN_URL = LOGIN_PATH
 LOGIN_REDIRECT_URL = '/sensores/dashboard/'
-LOGIN_URL = '/login/'
-LOGOUT_REDIRECT_URL = '/login/'
+LOGOUT_REDIRECT_URL = LOGIN_PATH

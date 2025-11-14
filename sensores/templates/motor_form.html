@@ -3,19 +3,101 @@
 {% block title %}MOTOSENSE - Formulário Motor{% endblock %}
 
 {% block content %}
-<div class="container">
-    <div class="card" style="max-width: 600px; margin: 0 auto;">
-        <h2 class="title title-md">Formulário de Motor</h2>
-        
-        <form method="post">
-            {% csrf_token %}
-            {{ form.as_p }}
-            
-            <div style="margin-top: var(--space-lg);">
-                <button type="submit" class="btn btn-primary">Salvar</button>
-                <a href="{% url 'sensores:listar_motor' %}" class="btn btn-secondary">Cancelar</a>
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    {% if form.instance.pk %}
+                        📝 Editar Motor
+                    {% else %}
+                        ➕ Cadastrar Novo Motor
+                    {% endif %}
+                </h5>
             </div>
-        </form>
+            <div class="card-body">
+                <form method="post" id="motorForm">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="{{ form.nome.id_for_label }}" class="form-label">Nome do Motor *</label>
+                        {{ form.nome }}
+                        <div class="invalid-feedback" id="nome-error"></div>
+                        <div class="form-text">Nome identificador único do motor</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="{{ form.tipo.id_for_label }}" class="form-label">Tipo de Motor *</label>
+                        {{ form.tipo }}
+                        <div class="invalid-feedback" id="tipo-error"></div>
+                        <div class="form-text">Categoria do motor (Industrial, Comercial, Residencial)</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="{{ form.potencia.id_for_label }}" class="form-label">Potência (HP) *</label>
+                        {{ form.potencia }}
+                        <div class="invalid-feedback" id="potencia-error"></div>
+                        <div class="form-text">Potência nominal em horsepower</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="{{ form.descricao.id_for_label }}" class="form-label">Descrição</label>
+                        {{ form.descricao }}
+                        <div class="form-text">Informações adicionais sobre o motor (opcional)</div>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary" id="submitBtn">
+                            <span class="spinner-border spinner-border-sm d-none" id="loadingSpinner"></span>
+                            <i class="fas fa-save" id="saveIcon"></i> Salvar
+                        </button>
+                        <a href="{% url 'sensores:listar_motor' %}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Voltar
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
 </div>
+
+<script>
+document.getElementById('motorForm').addEventListener('submit', function(e) {
+    const submitBtn = document.getElementById('submitBtn');
+    const loadingSpinner = document.getElementById('loadingSpinner');
+    const saveIcon = document.getElementById('saveIcon');
+
+    // Validação frontend
+    let isValid = true;
+    const nome = document.getElementById('{{ form.nome.id_for_label }}');
+    const tipo = document.getElementById('{{ form.tipo.id_for_label }}');
+    const potencia = document.getElementById('{{ form.potencia.id_for_label }}');
+
+    // Reset errors
+    document.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+
+    if (!nome.value.trim()) {
+        nome.classList.add('is-invalid');
+        document.getElementById('nome-error').textContent = 'Nome do motor é obrigatório';
+        isValid = false;
+    }
+
+    if (!tipo.value) {
+        tipo.classList.add('is-invalid');
+        document.getElementById('tipo-error').textContent = 'Selecione o tipo do motor';
+        isValid = false;
+    }
+
+    if (!potencia.value || isNaN(potencia.value) || parseFloat(potencia.value) <= 0) {
+        potencia.classList.add('is-invalid');
+        document.getElementById('potencia-error').textContent = 'Potência deve ser um número positivo';
+        isValid = false;
+    }
+
+    if (!isValid) {
+        e.preventDefault();
+        return;
+    }
+
+    // Loading state
+    submitBtn.disabled = true;
+    loadingSpinner.classList.remove('d-none');
+    saveIcon.classList.add('d-none');
+});
+</script>
 {% endblock %}
