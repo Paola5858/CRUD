@@ -31,7 +31,7 @@ PORT = 1883
 TOPIC = "dadosSensor"
 USERNAME = "idoufayf:idoufayf"
 PASSWORD = "DpH2tqSXK2l4s3tx5DNr3_ppS9aYGTis"
-CLIENT_ID = "motosense_worker_001"  # ID único
+CLIENT_ID = "motosense_worker_001"  # ID único - MANTER APENAS 1 WORKER RODANDO!
 
 # ========== VARIÁVEIS GLOBAIS ==========
 reconnect_count = 0
@@ -161,6 +161,7 @@ def start_worker():
     logger.info(f"Broker: {BROKER}:{PORT}")
     logger.info(f"Usuario: {USERNAME}")
     logger.info(f"Topico: {TOPIC}")
+    logger.info("AVISO: CloudAMQP gratuito - manter apenas 1 worker ativo!")
     logger.info("=" * 60 + "\n")
     
     # Criar diretório de logs se não existir
