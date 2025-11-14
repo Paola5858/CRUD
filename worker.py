@@ -137,6 +137,37 @@ def on_message(client, userdata, msg):
             fonte='MQTT',
             raw_json=data
         )
+        
+        # Enviar via WebSocket para dashboard em tempo real
+        try:
+            from channels.layers import get_channel_layer
+            from asgiref.sync import async_to_sync
+            
+            channel_layer = get_channel_layer()
+            if channel_layer:
+                async_to_sync(channel_layer.group_send)(
+                    'dashboard_updates',
+                    {
+                        'type': 'sensor_update',
+                        'data': {
+                            'motor_nome': motor.nome,
+                            'sensor_tipo': sensor.tipo,
+                            'valor': valor,
+                            'temperatura': data.get('temperatura'),
+                            'rpm': data.get('rpm'),
+                            'timestamp': dado.data_hora.isoformat()
+                        }
+                    }
+                )
+        except Exception as e:
+            logger.warning(f"Erro ao enviar WebSocket: {e}")
+        
+        # Verificar alertas
+        try:
+            from sensores.alerts import alert_manager
+            alert_manager.check_thresholds(dado)
+        except Exception as e:
+            logger.warning(f"Erro ao verificar alertas: {e}")
 
         logger.info("=" * 60)
         logger.info("DADOS SALVOS COM SUCESSO!")
