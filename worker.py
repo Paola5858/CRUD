@@ -94,29 +94,31 @@ def on_message(client, userdata, msg):
         # Parser JSON
         data = json.loads(payload)
         
-        # Validar estrutura
-        required_fields = ['motor_id', 'sensor_id', 'valor']
-        missing_fields = [field for field in required_fields if field not in data]
+        # Aceitar ambos os formatos (motor_id ou motorid)
+        motor_id = data.get('motor_id') or data.get('motorid')
+        sensor_id = data.get('sensor_id') or data.get('sensorid')
+        valor = data.get('valor')
         
-        if missing_fields:
-            logger.error(f"❌ JSON INVÁLIDO! Campos faltando: {missing_fields}")
-            logger.error(f"   Campos obrigatórios: {required_fields}")
+        if not motor_id or not sensor_id or not valor:
+            logger.error(f"JSON INVALIDO! Faltam campos obrigatorios")
+            logger.error(f"   Recebido: {data}")
+            logger.error(f"   Esperado: motor_id/motorid, sensor_id/sensorid, valor")
             return
 
         # Buscar Motor e Sensor
         try:
-            motor = Motor.objects.get(id=data['motor_id'])
-            logger.info(f"✅ Motor encontrado: {motor.nome} (ID: {motor.id})")
+            motor = Motor.objects.get(id=motor_id)
+            logger.info(f"Motor encontrado: {motor.nome} (ID: {motor.id})")
         except Motor.DoesNotExist:
-            logger.error(f"❌ MOTOR NÃO ENCONTRADO! ID: {data['motor_id']}")
+            logger.error(f"MOTOR NAO ENCONTRADO! ID: {motor_id}")
             logger.error(f"   Cadastre o motor no Django Admin primeiro!")
             return
 
         try:
-            sensor = Sensor.objects.get(id=data['sensor_id'])
-            logger.info(f"✅ Sensor encontrado: {sensor.tipo} (ID: {sensor.id})")
+            sensor = Sensor.objects.get(id=sensor_id)
+            logger.info(f"Sensor encontrado: {sensor.tipo} (ID: {sensor.id})")
         except Sensor.DoesNotExist:
-            logger.error(f"❌ SENSOR NÃO ENCONTRADO! ID: {data['sensor_id']}")
+            logger.error(f"SENSOR NAO ENCONTRADO! ID: {sensor_id}")
             logger.error(f"   Cadastre o sensor no Django Admin primeiro!")
             return
 
@@ -124,7 +126,7 @@ def on_message(client, userdata, msg):
         dado = DadosSensor.objects.create(
             motor=motor,
             sensor=sensor,
-            valor=data['valor'],
+            valor=valor,
             temperatura=data.get('temperatura'),
             rpm=data.get('rpm'),
             pressao=data.get('pressao'),
@@ -137,7 +139,7 @@ def on_message(client, userdata, msg):
         logger.info(f"   ID do Registro: {dado.id}")
         logger.info(f"   Motor: {motor.nome}")
         logger.info(f"   Sensor: {sensor.tipo}")
-        logger.info(f"   Valor: {data['valor']}")
+        logger.info(f"   Valor: {valor}")
         logger.info(f"   Timestamp: {dado.data_hora}")
         logger.info("=" * 60)
 

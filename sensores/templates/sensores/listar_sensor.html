@@ -181,12 +181,12 @@
                 </div>
                 
                 <div class="sensor-actions">
-                    <button class="btn-sensor btn-edit" onclick="editSensor('{{ sensor.id }}')">
+                    <a href="{% url 'sensores:atualizar_sensor' sensor.id %}" class="btn-sensor btn-edit">
                         ✏️ Editar
-                    </button>
-                    <button class="btn-sensor btn-delete" onclick="deleteSensor('{{ sensor.id }}')">
+                    </a>
+                    <a href="{% url 'sensores:deletar_sensor' sensor.id %}" class="btn-sensor btn-delete" onclick="return confirm('Tem certeza que deseja deletar este sensor?')">
                         🗑️ Deletar
-                    </button>
+                    </a>
                 </div>
             </div>
             {% endfor %}
@@ -196,16 +196,16 @@
             <div class="empty-icon">📡</div>
             <h2 class="title title-md">Nenhum sensor encontrado</h2>
             <p>Adicione sensores para monitorar o sistema</p>
-            <button class="btn btn-primary" onclick="addSensor()">
+            <a href="{% url 'sensores:criar_sensor' %}" class="btn btn-primary">
                 ➕ Adicionar Sensor
-            </button>
+            </a>
         </div>
     {% endif %}
 </div>
 
-<button class="add-sensor-btn" onclick="addSensor()" title="Adicionar Sensor">
+<a href="{% url 'sensores:criar_sensor' %}" class="add-sensor-btn" title="Adicionar Sensor">
     ➕
-</button>
+</a>
 
 <!-- Dados para JavaScript -->
 <script>
