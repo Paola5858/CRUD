@@ -9,6 +9,81 @@
     <link href="https://fonts.googleapis.com/css2?family=Teko:wght@400;500;600;700;800&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'css/motosense-dashboard.css' %}">
     {% block extra_css %}{% endblock %}
+    
+    <style>
+    .sidebar-footer {
+        margin-top: auto;
+        padding: 20px;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .user-profile {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 16px;
+        padding: 12px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 8px;
+    }
+    
+    .user-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #ff6b00, #ff8c00);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+        font-size: 16px;
+        color: white;
+    }
+    
+    .user-name {
+        font-weight: 600;
+        color: #fff;
+        font-size: 14px;
+    }
+    
+    .user-role {
+        font-size: 11px;
+        color: #808080;
+        text-transform: uppercase;
+    }
+    
+    .logout-btn-modern {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 12px 16px;
+        background: rgba(255, 68, 68, 0.1);
+        border: 1px solid rgba(255, 68, 68, 0.3);
+        border-radius: 8px;
+        color: #ff6b6b;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        font-size: 13px;
+        font-weight: 600;
+    }
+    
+    .logout-btn-modern:hover {
+        background: rgba(255, 68, 68, 0.2);
+        border-color: #ff6b6b;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(255, 68, 68, 0.3);
+    }
+    
+    .logout-icon {
+        font-size: 16px;
+    }
+    
+    .logout-text {
+        font-size: 12px;
+        letter-spacing: 0.5px;
+    }
+    </style>
 </head>
 <body>
     <div class="hex-pattern-overlay"></div>
@@ -90,13 +165,13 @@
                     <div class="user-avatar">{{ user.username|slice:":2"|upper|default:"US" }}</div>
                     <div class="user-info">
                         <div class="user-name">{{ user.get_full_name|default:user.username }}</div>
-                        <div class="user-role">ADMINISTRADOR</div>
+                        <div class="user-role">{% if user.is_superuser %}ADMIN{% else %}OPERADOR{% endif %}</div>
                     </div>
-                    <a href="{% url 'logout' %}" class="logout-btn" title="Sair do sistema">
-                        <span style="font-size: 16px; margin-right: 5px;">🚪</span>
-                        <span style="font-size: 12px;">SAIR</span>
-                    </a>
                 </div>
+                <a href="{% url 'logout' %}" class="logout-btn-modern" title="Sair do sistema">
+                    <span class="logout-icon">🚪</span>
+                    <span class="logout-text">SAIR</span>
+                </a>
             </div>
         </aside>
         
@@ -105,6 +180,105 @@
             {% block content %}{% endblock %}
         </main>
     </div>
+    
+    <!-- Sistema de Notificações -->
+    <div id="toast-container"></div>
+    
+    <script>
+    function showToast(message, type = 'info') {
+        const container = document.getElementById('toast-container');
+        const toast = document.createElement('div');
+        toast.className = `toast toast-${type}`;
+        toast.innerHTML = `
+            <div class="toast-icon">${type === 'success' ? '✓' : type === 'error' ? '✗' : 'ℹ'}</div>
+            <div class="toast-message">${message}</div>
+            <button class="toast-close" onclick="this.parentElement.remove()">×</button>
+        `;
+        container.appendChild(toast);
+        
+        setTimeout(() => {
+            toast.classList.add('show');
+        }, 100);
+        
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => toast.remove(), 300);
+        }, 4000);
+    }
+    
+    // Mostrar notificação de boas-vindas
+    document.addEventListener('DOMContentLoaded', function() {
+        if (window.location.pathname.includes('dashboard')) {
+            setTimeout(() => {
+                showToast('Sistema MOTOSENSE carregado com sucesso!', 'success');
+            }, 1000);
+        }
+    });
+    </script>
+    
+    <style>
+    #toast-container {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 9999;
+    }
+    
+    .toast {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        background: #1a1a1a;
+        padding: 16px 20px;
+        border-radius: 8px;
+        margin-bottom: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        opacity: 0;
+        transform: translateX(100%);
+        transition: all 0.3s ease;
+        min-width: 300px;
+        border-left: 4px solid #ff6b00;
+    }
+    
+    .toast.show {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    
+    .toast-success {
+        border-left-color: #00ff00;
+    }
+    
+    .toast-error {
+        border-left-color: #ff4444;
+    }
+    
+    .toast-icon {
+        font-size: 18px;
+        font-weight: bold;
+    }
+    
+    .toast-message {
+        flex: 1;
+        color: white;
+        font-size: 14px;
+    }
+    
+    .toast-close {
+        background: none;
+        border: none;
+        color: #999;
+        font-size: 18px;
+        cursor: pointer;
+        padding: 0;
+        width: 20px;
+        height: 20px;
+    }
+    
+    .toast-close:hover {
+        color: white;
+    }
+    </style>
     
     {% block extra_js %}{% endblock %}
 </body>
