@@ -1,0 +1,68 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    
+    <!-- SEO Básico -->
+    <title>{% block title %}MOTOSENSE - Sistema Industrial de Monitoramento IoT{% endblock %}</title>
+    <meta name="description" content="{% block description %}Sistema profissional de monitoramento em tempo real para motores industriais com IoT, MQTT e dashboard interativo.{% endblock %}">
+    <meta name="keywords" content="IoT, monitoramento industrial, sensores, motores, MQTT, dashboard, indústria 4.0">
+    <meta name="author" content="Paola Machado">
+    <meta name="robots" content="index, follow">
+    
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="MOTOSENSE">
+    <meta property="og:title" content="{% block og_title %}MOTOSENSE - Dashboard Industrial IoT{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}Monitore motores industriais em tempo real com nossa plataforma IoT.{% endblock %}">
+    
+    <!-- Theme Color -->
+    <meta name="theme-color" content="#ff6b00">
+    <link rel="manifest" href="{% static 'manifest.json' %}">
+    
+    <!-- CSS crítico inline -->
+    <style>
+        body{margin:0;background:#0d0d0d;color:#fff;font-family:Inter,sans-serif}
+        .loading{display:flex;justify-content:center;align-items:center;height:100vh}
+        .loading-spinner{width:40px;height:40px;border:4px solid rgba(255,107,0,0.2);border-top-color:#ff6b00;border-radius:50%;animation:rotate 1s linear infinite}
+        @keyframes rotate{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+    </style>
+    
+    <!-- CSS não-crítico -->
+    <link rel="stylesheet" href="{% static 'css/motosense-core.css' %}">
+    <link rel="stylesheet" href="{% static 'css/motosense-animations.css' %}">
+    <link rel="stylesheet" href="{% static 'css/motosense-print.css' %}">
+</head>
+<body>
+    <!-- Loading inicial -->
+    <div id="loading" class="loading">
+        <div class="loading-spinner"></div>
+    </div>
+    
+    <div id="app" style="display:none;">
+        {% block content %}{% endblock %}
+    </div>
+    
+    <!-- Scripts no final -->
+    <script src="{% static 'js/motosense-dashboard.js' %}" defer></script>
+    <script src="{% static 'js/motosense-animations.js' %}" defer></script>
+    <script src="{% static 'js/motosense-export.js' %}" defer></script>
+    
+    <!-- Service Worker -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('{% static "js/service-worker.js" %}');
+            });
+        }
+        
+        window.addEventListener('load', () => {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('app').style.display = 'block';
+        });
+    </script>
+</body>
+</html>

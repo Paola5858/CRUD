@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /static/
+Disallow: /media/
+Disallow: /api/
+Disallow: /logout/
+
+Sitemap: https://motosense.com/sitemap.xml
