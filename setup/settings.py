@@ -274,5 +274,6 @@ LOGGING = {
 
 # Login/Logout URLs
 LOGIN_URL = '/login/'
-LOGIN_REDIRECT_URL = '/'
+LOGIN_REDIRECT_URL = '/sensores/dashboard/'
+LOGIN_URL = '/login/'
 LOGOUT_REDIRECT_URL = '/login/'

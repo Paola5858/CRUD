@@ -21,9 +21,11 @@ from django.conf import settings
 
 from django.views.generic import RedirectView
 
+from django.views.generic import RedirectView
+
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', RedirectView.as_view(url='/login/', permanent=False)),
+    path('', RedirectView.as_view(url='/login/', permanent=False), name='home'),
     path('', include('usuarios.urls')),
     path('sensores/', include('sensores.urls')),
     path('dashboard/', include('dashboard.urls')),

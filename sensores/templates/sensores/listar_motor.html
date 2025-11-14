@@ -1,6 +1,8 @@
-{% extends 'sensores/base.html' %}
+{% extends 'base_dashboard.html' %}
 
-{% block main_content %}
+{% block title %}MOTOSENSE - Motores{% endblock %}
+
+{% block content %}
 <div class="page-header">
     <h1>Motores</h1>
     <a href="{% url 'sensores:criar_motor' %}" class="btn btn-primary">+ Novo Motor</a>

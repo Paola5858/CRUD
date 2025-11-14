@@ -1,6 +1,8 @@
-{% extends 'sensores/base.html' %}
+{% extends 'base_dashboard.html' %}
 
-{% block main_content %}
+{% block title %}MOTOSENSE - Dados{% endblock %}
+
+{% block content %}
 <div class="page-header">
     <h1>Dados dos Sensores</h1>
     <a href="{% url 'sensores:criar_dados' %}" class="btn btn-primary">+ Novo Dado</a>

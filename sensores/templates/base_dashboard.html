@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}MOTOSENSE{% endblock %}</title>
+    
+    {% load static %}
+    <link href="https://fonts.googleapis.com/css2?family=Teko:wght@400;500;600;700;800&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/motosense-dashboard.css' %}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <div class="hex-pattern-overlay"></div>
+    
+    <div class="dashboard-container">
+        <!-- SIDEBAR UNIFICADA -->
+        <aside class="sidebar">
+            <div class="logo-section">
+                <div class="logo-container">
+                    <div class="skull-icon">💀</div>
+                </div>
+                <div class="brand-text">
+                    <div class="brand-name">MOTOSENSE</div>
+                    <div class="brand-tagline">SISTEMA DE CONTROLE</div>
+                </div>
+            </div>
+            
+            <nav class="nav-menu">
+                <div class="nav-section-label">NAVEGAÇÃO</div>
+                
+                <a href="{% url 'sensores:dashboard' %}" class="nav-item {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+                    <div class="nav-icon-container">
+                        <span class="nav-icon">📊</span>
+                    </div>
+                    <span class="nav-text">Dashboard</span>
+                    {% if request.resolver_match.url_name == 'dashboard' %}
+                    <div class="active-indicator"></div>
+                    <div class="speed-lines">
+                        <div class="speed-line"></div>
+                        <div class="speed-line"></div>
+                        <div class="speed-line"></div>
+                    </div>
+                    {% endif %}
+                </a>
+                
+                <a href="{% url 'sensores:listar_motor' %}" class="nav-item {% if 'motor' in request.resolver_match.url_name %}active{% endif %}">
+                    <div class="nav-icon-container">
+                        <span class="nav-icon">🏍️</span>
+                    </div>
+                    <span class="nav-text">Motores</span>
+                    {% if 'motor' in request.resolver_match.url_name %}
+                    <div class="active-indicator"></div>
+                    {% endif %}
+                </a>
+                
+                <a href="{% url 'sensores:listar_sensor' %}" class="nav-item {% if 'sensor' in request.resolver_match.url_name %}active{% endif %}">
+                    <div class="nav-icon-container">
+                        <span class="nav-icon">📡</span>
+                    </div>
+                    <span class="nav-text">Sensores</span>
+                    {% if 'sensor' in request.resolver_match.url_name %}
+                    <div class="active-indicator"></div>
+                    {% endif %}
+                </a>
+                
+                <a href="{% url 'sensores:listar_dados' %}" class="nav-item {% if 'dados' in request.resolver_match.url_name %}active{% endif %}">
+                    <div class="nav-icon-container">
+                        <span class="nav-icon">📊</span>
+                    </div>
+                    <span class="nav-text">Dados</span>
+                    {% if 'dados' in request.resolver_match.url_name %}
+                    <div class="active-indicator"></div>
+                    {% endif %}
+                </a>
+            </nav>
+            
+            <div class="sidebar-stats">
+                <div class="quick-stat">
+                    <span class="stat-icon">🔥</span>
+                    <div class="stat-info">
+                        <div class="stat-label">SISTEMA</div>
+                        <div class="stat-value">ONLINE</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <div class="user-avatar">{{ user.username|slice:":2"|upper|default:"US" }}</div>
+                    <div class="user-info">
+                        <div class="user-name">{{ user.get_full_name|default:user.username }}</div>
+                        <div class="user-role">ADMINISTRADOR</div>
+                    </div>
+                    <a href="{% url 'logout' %}" class="logout-btn" title="Sair do sistema">🚪</a>
+                </div>
+            </div>
+        </aside>
+        
+        <!-- MAIN CONTENT -->
+        <main class="main-content">
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
