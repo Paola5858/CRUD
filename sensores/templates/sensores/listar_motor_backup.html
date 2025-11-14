@@ -1,0 +1,567 @@
+{% extends 'base_optimized.html' %}
+{% load static %}
+
+{% block title %}MOTOSENSE - Motores{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/motosense-crud.css' %}?v={{ css_version }}">
+<style>
+/* Critical CSS para motores */
+.motor-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: var(--space-lg); }
+.motor-card { background: var(--dark); border: 2px solid rgba(255,107,0,0.2); border-radius: var(--radius-md); padding: var(--space-lg); }
+.motor-card:hover { border-color: var(--primary); }
+</style>
+{% endblock %}
+
+{% block content %}
+
+    <!-- Hex Pattern Overlay -->
+    <div class="hex-pattern-overlay"></div>
+    
+    <!-- Main Container -->
+    <div class="dashboard-container">
+        
+        <!-- LEFT SIDEBAR (IDENTICAL TO HOMEPAGE) -->
+        <aside class="sidebar">
+            <!-- Logo Section -->
+            <div class="logo-section">
+                <div class="logo-container">
+                    <div class="skull-icon">💀</div>
+                </div>
+                <div class="brand-text">
+                    <div class="brand-name">MOTOSENSE</div>
+                    <div class="brand-tagline">SISTEMA DE CONTROLE</div>
+                </div>
+                <button class="sidebar-toggle" id="sidebarToggle">
+                    <span class="toggle-icon">⟨</span>
+                </button>
+            </div>
+            
+            <!-- Navigation Menu -->
+            <nav class="nav-menu">
+                <div class="nav-section-label">NAVEGAÇÃO</div>
+                
+                <a href="{% url 'dashboard:index' %}" class="nav-item">
+                    <div class="nav-icon-container">
+                        <span class="nav-icon">📊</span>
+                    </div>
+                    <span class="nav-text">Dashboard</span>
+                </a>
+                
+                <a href="{% url 'sensores:listar_motor' %}" class="nav-item active">
+                    <div class="nav-icon-container">
+                        <span class="nav-icon">🏍️</span>
+                    </div>
+                    <span class="nav-text">Motores</span>
+                    <div class="active-indicator"></div>
+                    <div class="speed-lines">
+                        <div class="speed-line"></div>
+                        <div class="speed-line"></div>
+                        <div class="speed-line"></div>
+                    </div>
+                </a>
+                
+                <a href="{% url 'sensores:listar_sensor' %}" class="nav-item">
+                    <div class="nav-icon-container">
+                        <span class="nav-icon">📡</span>
+                    </div>
+                    <span class="nav-text">Sensores</span>
+                </a>
+                
+                <a href="{% url 'sensores:listar_dados' %}" class="nav-item">
+                    <div class="nav-icon-container">
+                        <span class="nav-icon">📊</span>
+                    </div>
+                    <span class="nav-text">Dados</span>
+                </a>
+                
+                <!-- Relatórios e Configurações removidos temporariamente -->
+            </nav>
+            
+            <!-- Sidebar Stats Panel -->
+            <div class="sidebar-stats">
+                <div class="quick-stat">
+                    <span class="stat-icon">🔥</span>
+                    <div class="stat-info">
+                        <div class="stat-label">MOTORES ATIVOS</div>
+                        <div class="stat-value">8/12</div>
+                    </div>
+                </div>
+                <div class="quick-stat">
+                    <span class="stat-icon">⚡</span>
+                    <div class="stat-info">
+                        <div class="stat-label">POTÊNCIA TOTAL</div>
+                        <div class="stat-value">24.2 kW</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Sidebar Footer -->
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <div class="user-avatar">{{ user.username|slice:":2"|upper|default:"US" }}</div>
+                    <div class="user-info">
+                        <div class="user-name">{{ user.get_full_name|default:user.username }}</div>
+                        <div class="user-role">ADMINISTRADOR</div>
+                    </div>
+                    <a href="{% url 'logout' %}" class="logout-btn" title="Sair do sistema">🚪</a>
+                </div>
+            </div>
+        </aside>
+        
+        <!-- MAIN CONTENT -->
+        <main class="main-content">
+            
+            <!-- PAGE HEADER - COMMAND CENTER -->
+            <header class="page-header">
+                <!-- Tier 1 - Breadcrumb + Live indicator -->
+                <div class="header-tier-1">
+                    <div class="breadcrumb">
+                        <span class="breadcrumb-item">🏠 INÍCIO</span>
+                        <span class="breadcrumb-separator">›</span>
+                        <span class="breadcrumb-item">📊 DASHBOARD</span>
+                        <span class="breadcrumb-separator">›</span>
+                        <span class="breadcrumb-item current">🏍️ MOTORES</span>
+                    </div>
+                    <div class="live-indicator">
+                        <div class="pulse-dot"></div>
+                        <span class="live-text">● AO VIVO</span>
+                    </div>
+                </div>
+                
+                <!-- Tier 2 - Page title + Quick actions -->
+                <div class="header-tier-2">
+                    <div class="title-section">
+                        <h1 class="page-title">GERENCIAMENTO DE MOTORES</h1>
+                    </div>
+                    
+                    <div class="action-buttons">
+                        <a href="{% url 'sensores:criar_motor' %}" class="btn-primary mega-cta" id="btnNovoMotor">
+                            <span class="btn-icon">➕</span>
+                            <span class="btn-text">NOVO MOTOR</span>
+                        </a>
+                        
+                        <button class="btn-secondary" id="btnImportar">
+                            <span class="btn-icon">📤</span>
+                            <span class="btn-text">IMPORTAR CSV</span>
+                        </button>
+                        
+                        <button class="btn-secondary" id="btnExportar">
+                            <span class="btn-icon">📥</span>
+                            <span class="btn-text">EXPORTAR</span>
+                        </button>
+                        
+                        <button class="btn-icon-only" id="btnMais">
+                            <span class="btn-icon">⋮</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Tier 3 - Statistics bar -->
+                <div class="header-tier-3">
+                    <div class="stat-pill">
+                        <span class="stat-icon">🏍️</span>
+                        <span class="stat-value">12 MOTORES</span>
+                    </div>
+                    
+                    <div class="stat-pill">
+                        <span class="stat-icon">⚡</span>
+                        <span class="stat-value">24.2 kW TOTAL</span>
+                    </div>
+                    
+                    <div class="stat-pill">
+                        <span class="stat-icon rotating">🔄</span>
+                        <span class="stat-value cyan">3.450 RPM MÉDIO</span>
+                    </div>
+                    
+                    <div class="stat-pill">
+                        <span class="stat-icon">✓</span>
+                        <span class="stat-value green">66% DISPONIBILIDADE</span>
+                    </div>
+                </div>
+            </header>
+            
+            <!-- ADVANCED TOOLBAR - MISSION CONTROL -->
+            <div class="advanced-toolbar">
+                <!-- Left - Search + Quick filters -->
+                <div class="toolbar-left">
+                    <div class="super-search">
+                        <div class="search-icon">🔍</div>
+                        <input type="text" class="search-input" placeholder="Buscar por nome, serial, tipo, potência, status..." id="searchInput">
+                    </div>
+                    
+                    <div class="quick-filters">
+                        <div class="filter-tag active">
+                            <span>INDUSTRIAL</span>
+                            <button class="remove-filter">✕</button>
+                        </div>
+                        <div class="filter-tag">
+                            <span>ONLINE</span>
+                            <button class="remove-filter">✕</button>
+                        </div>
+                        <div class="filter-tag">
+                            <span>> 2000W</span>
+                            <button class="remove-filter">✕</button>
+                        </div>
+                        <div class="filter-tag">
+                            <span>ALTA TEMP</span>
+                            <button class="remove-filter">✕</button>
+                        </div>
+                        <div class="filter-tag">
+                            <span>NOVOS</span>
+                            <button class="remove-filter">✕</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Center - View Mode Toggle -->
+                <div class="toolbar-center">
+                    <div class="view-toggle">
+                        <button class="view-btn active" data-view="table">
+                            <span class="view-icon">≣</span>
+                            <span class="view-text">TABLE</span>
+                        </button>
+                        <button class="view-btn" data-view="grid">
+                            <span class="view-icon">▦</span>
+                            <span class="view-text">GRID</span>
+                        </button>
+                        <button class="view-btn" data-view="kanban">
+                            <span class="view-icon">▢</span>
+                            <span class="view-text">KANBAN</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Right - Sort + Display options -->
+                <div class="toolbar-right">
+                    <div class="bulk-actions" id="bulkActions" style="display: none;">
+                        <span class="bulk-text">3 SELECIONADOS • AÇÕES</span>
+                        <span class="bulk-dropdown">▾</span>
+                    </div>
+                    
+                    <div class="sort-dropdown">
+                        <span class="sort-text">ORDENAR: NOME ↓</span>
+                        <span class="sort-icon">▼</span>
+                    </div>
+                    
+                    <div class="density-toggle">
+                        <button class="density-btn">COMPACTO</button>
+                        <button class="density-btn active">PADRÃO</button>
+                        <button class="density-btn">CONFORTÁVEL</button>
+                    </div>
+                    
+                    <button class="column-config-btn">
+                        <span class="btn-icon">⚙️</span>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- ULTRA-ADVANCED DATA TABLE -->
+            <div class="table-container">
+                <div class="table-card">
+                    
+                    <!-- Bulk Actions Bar (Conditional) -->
+                    <div class="bulk-actions-bar" id="bulkActionsBar" style="display: none;">
+                        <div class="bulk-left">
+                            <input type="checkbox" class="bulk-checkbox" id="selectAll">
+                            <span class="bulk-count">3 MOTORES SELECIONADOS</span>
+                        </div>
+                        <div class="bulk-right">
+                            <button class="bulk-btn green">
+                                <span class="btn-icon">✓</span>
+                                <span class="btn-text">ATIVAR TODOS</span>
+                            </button>
+                            <button class="bulk-btn amber">
+                                <span class="btn-icon">⏸</span>
+                                <span class="btn-text">PAUSAR</span>
+                            </button>
+                            <button class="bulk-btn red">
+                                <span class="btn-icon">🗑️</span>
+                                <span class="btn-text">DELETAR</span>
+                            </button>
+                            <button class="bulk-btn gray">
+                                <span class="btn-icon">🏷️</span>
+                                <span class="btn-text">ADICIONAR TAG</span>
+                            </button>
+                            <button class="bulk-btn orange">
+                                <span class="btn-icon">↓</span>
+                                <span class="btn-text">EXPORTAR SELEÇÃO</span>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Table Header -->
+                    <div class="table-header">
+                        <div class="header-cell checkbox-col">
+                            <input type="checkbox" class="header-checkbox" id="headerCheckbox">
+                        </div>
+                        <div class="header-cell id-col">
+                            <span class="drag-handle">⠿</span>
+                            <span class="header-text">ID</span>
+                            <span class="sort-indicator">↕</span>
+                        </div>
+                        <div class="header-cell motor-col">
+                            <span class="header-text">🏍️ MOTOR</span>
+                            <span class="sort-indicator active">↓</span>
+                        </div>
+                        <div class="header-cell type-col">
+                            <span class="header-text">📦 TIPO</span>
+                            <span class="sort-indicator">↕</span>
+                        </div>
+                        <div class="header-cell power-col">
+                            <span class="header-text">⚡ POTÊNCIA</span>
+                            <span class="sort-indicator">↕</span>
+                        </div>
+                        <div class="header-cell temp-col">
+                            <span class="header-text">🌡️ TEMP</span>
+                            <span class="sort-indicator">↕</span>
+                        </div>
+                        <div class="header-cell rpm-col">
+                            <span class="header-text">🔄 RPM</span>
+                            <span class="sort-indicator">↕</span>
+                        </div>
+                        <div class="header-cell status-col">
+                            <span class="header-text">🎚️ STATUS</span>
+                            <span class="sort-indicator">↕</span>
+                        </div>
+                        <div class="header-cell date-col">
+                            <span class="header-text">📅 CRIADO</span>
+                            <span class="sort-indicator">↕</span>
+                        </div>
+                        <div class="header-cell actions-col">
+                            <span class="header-text">⚡ AÇÕES</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Table Body -->
+                    <div class="table-body" id="tableBody">
+                        <!-- Rows will be populated by JavaScript -->
+                    </div>
+                    
+                </div>
+                
+                <!-- Table Footer - Advanced Pagination -->
+                <div class="table-footer">
+                    <div class="footer-left">
+                        <div class="rows-per-page">
+                            <span class="footer-label">LINHAS POR PÁGINA:</span>
+                            <select class="rows-select">
+                                <option value="10">10</option>
+                                <option value="25" selected>25</option>
+                                <option value="50">50</option>
+                                <option value="100">100</option>
+                            </select>
+                        </div>
+                        
+                        <div class="total-info">
+                            <span class="total-text">Mostrando 1-12 de 47 motores</span>
+                        </div>
+                    </div>
+                    
+                    <div class="footer-center">
+                        <div class="page-info">
+                            <span class="page-text">Página 1 de 5</span>
+                        </div>
+                    </div>
+                    
+                    <div class="footer-right">
+                        <div class="pagination-controls">
+                            <button class="page-btn" disabled>
+                                <span class="btn-icon">⟨⟨</span>
+                            </button>
+                            <button class="page-btn" disabled>
+                                <span class="btn-icon">⟨</span>
+                            </button>
+                            
+                            <div class="page-numbers">
+                                <button class="page-number active">1</button>
+                                <button class="page-number">2</button>
+                                <button class="page-number">3</button>
+                                <span class="page-ellipsis">...</span>
+                                <button class="page-number">5</button>
+                            </div>
+                            
+                            <button class="page-btn">
+                                <span class="btn-icon">⟩</span>
+                            </button>
+                            <button class="page-btn">
+                                <span class="btn-icon">⟩⟩</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <!-- Speed Lines Decorative Elements -->
+    <div class="speed-lines-decoration">
+        <div class="speed-line-dec"></div>
+        <div class="speed-line-dec"></div>
+        <div class="speed-line-dec"></div>
+        <div class="speed-line-dec"></div>
+        <div class="speed-line-dec"></div>
+    </div>
+    
+    <!-- Corner Accents -->
+    <div class="corner-accent top-left"></div>
+    <div class="corner-accent bottom-right"></div>
+    
+    <!-- Modal for New Motor -->
+    <div class="modal-overlay" id="modalOverlay" style="display: none;">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h2 class="modal-title">➕ NOVO MOTOR</h2>
+                <button class="modal-close" id="modalClose">✕</button>
+            </div>
+            <div class="modal-body">
+                <form id="motorForm" class="motor-form" method="POST" action="{% url 'sensores:criar_motor' %}">
+                    {% csrf_token %}
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">🏍️ NOME DO MOTOR</label>
+                            <input type="text" class="form-input" name="nome" placeholder="Ex: Motor Turbo A1" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">📦 TIPO</label>
+                            <select class="form-select" name="tipo" required>
+                                <option value="">Selecione o tipo</option>
+                                <option value="INDUSTRIAL">Industrial</option>
+                                <option value="RESIDENCIAL">Residencial</option>
+                                <option value="COMERCIAL">Comercial</option>
+                                <option value="RACING">Racing</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">⚡ POTÊNCIA (W)</label>
+                            <input type="number" class="form-input" name="potencia" placeholder="Ex: 1500" min="1" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">🔄 RPM MÁXIMO</label>
+                            <input type="number" class="form-input" name="rpm_max" placeholder="Ex: 3600" min="1" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group full-width">
+                            <label class="form-label">📝 DESCRIÇÃO</label>
+                            <textarea class="form-textarea" name="descricao" placeholder="Descrição detalhada do motor..." rows="3"></textarea>
+                        </div>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" class="btn-cancel" id="btnCancel">CANCELAR</button>
+                        <button type="submit" class="btn-save">
+                            <span class="btn-icon">💾</span>
+                            <span class="btn-text">SALVAR MOTOR</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Dados do Backend -->
+    <script>
+        // Dados vindos do Django
+        window.MOTORES_BACKEND = {{ motores_json|safe|default:'[]' }};
+    </script>
+    
+    <!-- Sistema de Notificações -->
+    <div id="notificationContainer" class="notification-container"></div>
+    
+    <!-- JavaScript -->
+    <script>
+        // CSRF Token para AJAX
+        window.CSRF_TOKEN = '{{ csrf_token }}';
+        
+        // Sistema de Notificações
+        function showNotification(message, type = 'success', duration = 5000) {
+            const container = document.getElementById('notificationContainer');
+            const notification = document.createElement('div');
+            notification.className = `notification notification-${type}`;
+            
+            const icons = {
+                success: '✅',
+                error: '❌',
+                warning: '⚠️',
+                info: 'ℹ️'
+            };
+            
+            notification.innerHTML = `
+                <div class="notification-content">
+                    <span class="notification-icon">${icons[type] || icons.info}</span>
+                    <span class="notification-message">${message}</span>
+                    <button class="notification-close" onclick="this.parentElement.parentElement.remove()">✕</button>
+                </div>
+            `;
+            
+            container.appendChild(notification);
+            
+            // Auto-remove após duration
+            setTimeout(() => {
+                if (notification.parentElement) {
+                    notification.remove();
+                }
+            }, duration);
+        }
+        
+        // Interceptar submissão de formulários
+        document.addEventListener('DOMContentLoaded', function() {
+            const motorForm = document.getElementById('motorForm');
+            if (motorForm) {
+                motorForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    const formData = new FormData(this);
+                    const submitBtn = this.querySelector('.btn-save');
+                    const originalText = submitBtn.innerHTML;
+                    
+                    // Loading state
+                    submitBtn.innerHTML = '<span class="btn-icon">⏳</span><span class="btn-text">SALVANDO...</span>';
+                    submitBtn.disabled = true;
+                    
+                    fetch(this.action, {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-CSRFToken': window.CSRF_TOKEN,
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            showNotification('Motor salvo com sucesso!', 'success');
+                            document.getElementById('modalOverlay').style.display = 'none';
+                            this.reset();
+                            // Recarregar dados da tabela
+                            if (window.loadMotorData) {
+                                window.loadMotorData();
+                            }
+                        } else {
+                            showNotification(data.message || 'Erro ao salvar motor', 'error');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Erro:', error);
+                        showNotification('Erro de conexão. Tente novamente.', 'error');
+                    })
+                    .finally(() => {
+                        // Restore button
+                        submitBtn.innerHTML = originalText;
+                        submitBtn.disabled = false;
+                    });
+                });
+            }
+        });
+    </script>
+    <script src="{% static 'js/motosense-interactive.js' %}"></script>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/motosense-interactive.js' %}?v={{ js_version }}"></script>
+{% endblock %}

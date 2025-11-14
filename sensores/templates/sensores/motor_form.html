@@ -1,0 +1,28 @@
+{% extends 'sensores/base.html' %}
+
+{% block main_content %}
+<div class="page-header">
+    <h1>{% if object %}Editar Motor{% else %}Novo Motor{% endif %}</h1>
+</div>
+
+<div class="form-container">
+    <form method="post" class="crud-form">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label for="id_nome">Nome:</label>
+            <input type="text" name="nome" id="id_nome" value="{{ form.nome.value|default:'' }}" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="id_potencia">Potência (W):</label>
+            <input type="number" step="0.01" name="potencia" id="id_potencia" value="{{ form.potencia.value|default:'' }}" required>
+        </div>
+        
+        <div class="form-actions">
+            <a href="{% url 'sensores:listar_motor' %}" class="btn btn-secondary">Cancelar</a>
+            <button type="submit" class="btn btn-primary">Salvar</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,57 @@
+{% extends 'base_optimized.html' %}
+{% load static %}
+
+{% block content %}
+<div class="dashboard-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="logo-section">
+            <div class="logo-container">
+                <div class="skull-icon">💀</div>
+            </div>
+            <div class="brand-text">
+                <div class="brand-name">MOTOSENSE</div>
+                <div class="brand-tagline">SISTEMA DE CONTROLE</div>
+            </div>
+        </div>
+        
+        <nav class="nav-menu">
+            <div class="nav-section-label">NAVEGAÇÃO</div>
+            
+            <a href="{% url 'sensores:dashboard' %}" class="nav-item">
+                <span class="nav-icon">📊</span>
+                <span class="nav-text">Dashboard</span>
+            </a>
+            
+            <a href="{% url 'sensores:listar_motor' %}" class="nav-item">
+                <span class="nav-icon">🏍️</span>
+                <span class="nav-text">Motores</span>
+            </a>
+            
+            <a href="{% url 'sensores:listar_sensor' %}" class="nav-item">
+                <span class="nav-icon">📡</span>
+                <span class="nav-text">Sensores</span>
+            </a>
+            
+            <a href="{% url 'sensores:listar_dados' %}" class="nav-item">
+                <span class="nav-icon">📊</span>
+                <span class="nav-text">Dados</span>
+            </a>
+        </nav>
+        
+        <div class="sidebar-footer">
+            <div class="user-profile">
+                <div class="user-info">
+                    <div class="user-name">{{ user.username }}</div>
+                </div>
+                <a href="{% url 'logout' %}" class="logout-btn">🚪</a>
+            </div>
+        </div>
+    </aside>
+    
+    <!-- Main Content -->
+    <main class="main-content">
+        {% block main_content %}{% endblock %}
+    </main>
+</div>
+{% endblock %}
