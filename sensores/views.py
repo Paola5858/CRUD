@@ -1,3 +1,13 @@
+"""
+Views para gerenciamento de sensores e motores.
+
+Este módulo contém todas as views responsáveis pelo CRUD
+de motores, sensores e dados do sistema MOTOSENSE.
+
+Autor: Paola Machado
+Data: 2025-11-14
+"""
+
 from django.views import View
 from django.shortcuts import render
 from django.http import Http404, JsonResponse
@@ -14,7 +24,18 @@ logger = logging.getLogger(__name__)
 
 def welcome_api(request):
     """
-    API endpoint that logs requests and returns a welcome message.
+    API endpoint que registra requisições e retorna mensagem de boas-vindas.
+    
+    Args:
+        request (HttpRequest): Objeto de requisição Django
+        
+    Returns:
+        JsonResponse: Mensagem de boas-vindas em JSON
+        
+    Example:
+        >>> response = welcome_api(request)
+        >>> response.status_code
+        200
     """
     logger.info(f"Request received: {request.method} {request.path}")
     return JsonResponse({"message": "Welcome to the MOTOSENSE API Service!"})
@@ -22,10 +43,40 @@ def welcome_api(request):
 
 
 class CrudView(LoginRequiredMixin, View):
+    """
+    View base para operações CRUD usando padrão Strategy.
+    
+    Esta classe implementa o padrão Strategy para delegar
+    operações CRUD para estratégias específicas, garantindo
+    código limpo e reutilizável.
+    
+    Attributes:
+        model_name (str): Nome do modelo (motor, sensor, dados)
+        action (str): Ação a ser executada (list, create, update, delete)
+        
+    Example:
+        class ListarMotorView(CrudView):
+            model_name = 'motor'
+            action = 'list'
+    """
     model_name = None
     action = None
 
     def dispatch(self, request, *args, **kwargs):
+        """
+        Intercepta requisições e configura estratégia apropriada.
+        
+        Args:
+            request (HttpRequest): Requisição HTTP
+            *args: Argumentos posicionais
+            **kwargs: Argumentos nomeados
+            
+        Returns:
+            HttpResponse: Resposta da estratégia ou página de erro
+            
+        Raises:
+            Http404: Se estratégia não for encontrada
+        """
         try:
             self.strategy = CrudFactory.get_strategy(self.model_name, self.action)
             return super().dispatch(request, *args, **kwargs)

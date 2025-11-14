@@ -1,146 +1,182 @@
 /**
- * ═══════════════════════════════════════════════════════════════
- * MOTOSENSE DASHBOARD - JAVASCRIPT
- * Chart.js integration using backend-provided data.
- * ═══════════════════════════════════════════════════════════════
+ * MOTOSENSE - Dashboard Interativo
+ * @fileoverview Scripts para gráficos e interações do dashboard
+ * @author Paola Machado
+ * @version 2.0.0
  */
 
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('🏍️ MOTOSENSE Dashboard Initializing...');
-
-    if (typeof Chart === 'undefined') {
-        console.error('❌ Chart.js is not available. Dashboard cannot be initialized.');
-        return;
+/**
+ * Configuração global dos gráficos Chart.js
+ * @constant {Object}
+ */
+const CHART_DEFAULTS = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+        legend: {
+            display: false
+        },
+        tooltip: {
+            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            titleColor: '#ff6b00',
+            bodyColor: '#fff',
+            borderColor: '#ff6b00',
+            borderWidth: 1
+        }
     }
-
-    // Initialize all charts with a single delay
-    setTimeout(() => {
-        console.log('Initializing charts...');
-        initMainChart();
-        initBarChart();
-        initGaugeChart();
-    }, 300);
-
-    // Update time immediately and then every second
-    updateTime();
-    setInterval(updateTime, 1000);
-
-    console.log('🔥 MOTOSENSE Dashboard Ready!');
-});
-
-// ━━━ CHART CONFIGURATIONS ━━━
-const chartColors = {
-    orange: '#ff6b00',
-    cyan: '#00d9ff',
-    amber: '#ffaa00',
-    green: '#00ff41',
-    red: '#ff3333',
-    white: '#ffffff',
-    gray: '#808080'
 };
 
-// ━━━ MAIN CHART (LINE) ━━━
-function initMainChart() {
-    const ctx = document.getElementById('mainChart');
-    if (!ctx) {
-        console.warn('MainChart canvas not found');
-        return;
-    }
-
-    // Sample data for demonstration
-    const data = {
-        labels: ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00'],
-        datasets: [
-            { label: 'Temperatura', data: [65, 70, 75, 80, 78, 72], borderColor: chartColors.orange, backgroundColor: chartColors.orange + '20', borderWidth: 3, fill: true, tension: 0.4 },
-            { label: 'Pressão', data: [2.1, 2.3, 2.5, 2.4, 2.2, 2.0], borderColor: chartColors.cyan, backgroundColor: chartColors.cyan + '20', borderWidth: 3, fill: true, tension: 0.4 },
-            { label: 'Velocidade', data: [1800, 2200, 2800, 3200, 2900, 2400], borderColor: chartColors.amber, backgroundColor: chartColors.amber + '20', borderWidth: 3, fill: true, tension: 0.4 }
-        ]
-    };
-
-    const config = createChartConfig(data);
-    new Chart(ctx, config);
-    console.log('Main chart initialized successfully');
-}
-
-// ━━━ BAR CHART ━━━
-function initBarChart() {
-    const ctx = document.getElementById('barChart');
-    if (!ctx) {
-        console.warn('BarChart canvas not found');
-        return;
-    }
-
-    // Sample data for demonstration
-    const data = {
-        labels: ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'],
-        datasets: [
-            { label: 'Temperatura', data: [68, 72, 75, 78, 76, 70, 69], backgroundColor: chartColors.orange + '80', borderColor: chartColors.orange, borderWidth: 2 },
-            { label: 'Pressão', data: [2.2, 2.4, 2.3, 2.5, 2.1, 2.0, 2.3], backgroundColor: chartColors.cyan + '80', borderColor: chartColors.cyan, borderWidth: 2 },
-            { label: 'Velocidade', data: [2000, 2400, 2800, 3200, 2900, 2200, 2100], backgroundColor: chartColors.amber + '80', borderColor: chartColors.amber, borderWidth: 2 }
-        ]
-    };
-
-    const config = createChartConfig(data, 'bar');
-    config.options.scales.y.ticks.callback = value => (value / 1000) + 'K';
-    new Chart(ctx, config);
-    console.log('Bar chart initialized successfully');
-}
-
-// ━━━ GAUGE CHART ━━━
-function initGaugeChart() {
-    const ctx = document.getElementById('gaugeChart');
-    if (!ctx) {
-        console.warn('GaugeChart canvas not found');
-        return;
-    }
-
-    // Sample value for demonstration
-    const value = 75;
-
-    const data = {
-        datasets: [{
-            data: [value, 100 - value],
-            backgroundColor: [chartColors.green, '#333333'],
-            borderWidth: 0,
-            cutout: '80%',
-            circumference: 180,
-            rotation: 270
-        }]
-    };
-
-    const config = { type: 'doughnut', data: data, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } } };
-    new Chart(ctx, config);
-    console.log('Gauge chart initialized successfully');
-}
-
-// ━━━ UTILITY FUNCTIONS ━━━
-function createChartConfig(data, type = 'line') {
-    return {
-        type: type,
-        data: data,
+/**
+ * Inicializa o gráfico principal de linhas
+ * @param {string} canvasId - ID do elemento canvas
+ * @param {Array} data - Array de dados para plotar
+ * @param {Array} labels - Labels para o eixo X
+ * @returns {Chart} Instância do Chart.js
+ * 
+ * @example
+ * const chart = initLineChart('mainChart', [10, 20, 30], ['Jan', 'Feb', 'Mar']);
+ */
+function initLineChart(canvasId, data, labels) {
+    const ctx = document.getElementById(canvasId).getContext('2d');
+    
+    return new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Valor do Sensor',
+                data: data,
+                borderColor: '#ff6b00',
+                backgroundColor: 'rgba(255, 107, 0, 0.2)',
+                borderWidth: 3,
+                fill: true,
+                tension: 0.4,
+                pointRadius: 6,
+                pointHoverRadius: 8,
+                pointBackgroundColor: '#ff6b00',
+                pointBorderColor: '#fff',
+                pointBorderWidth: 2
+            }]
+        },
         options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: { legend: { display: false } },
+            ...CHART_DEFAULTS,
             scales: {
-                x: { grid: { color: '#333', borderColor: '#666' }, ticks: { color: '#808080', font: { family: 'Barlow', size: 12, weight: '600' } } },
-                y: { grid: { color: '#333', borderColor: '#666' }, ticks: { color: '#808080', font: { family: 'Barlow', size: 12, weight: '600' } } }
-            },
-            elements: { point: { radius: 6, hoverRadius: 8, borderWidth: 2, backgroundColor: '#000' } }
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        color: '#808080',
+                        callback: function(value) {
+                            return value.toFixed(1);
+                        }
+                    },
+                    grid: {
+                        color: 'rgba(255, 255, 255, 0.1)'
+                    }
+                },
+                x: {
+                    ticks: {
+                        color: '#808080',
+                        maxRotation: 45,
+                        minRotation: 45
+                    },
+                    grid: {
+                        display: false
+                    }
+                }
+            }
         }
-    };
+    });
 }
 
-function updateTime() {
-    const now = new Date();
-    const timeElement = document.querySelector('.current-time');
-    const dateElement = document.querySelector('.current-date');
+/**
+ * Atualiza dados do gráfico em tempo real
+ * @param {Chart} chart - Instância do Chart.js
+ * @param {number} newValue - Novo valor a adicionar
+ * @param {string} newLabel - Novo label (timestamp)
+ * @param {number} maxDataPoints - Máximo de pontos a exibir
+ * 
+ * @example
+ * updateChartData(myChart, 42.5, '14:30:00', 10);
+ */
+function updateChartData(chart, newValue, newLabel, maxDataPoints = 10) {
+    // Adicionar novo dado
+    chart.data.labels.push(newLabel);
+    chart.data.datasets[0].data.push(newValue);
     
-    if (timeElement) {
-        timeElement.textContent = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+    // Remover dados antigos se exceder limite
+    if (chart.data.labels.length > maxDataPoints) {
+        chart.data.labels.shift();
+        chart.data.datasets[0].data.shift();
     }
     
-    if (dateElement) {
-        dateElement.textContent = now.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase();
+    // Animar atualização
+    chart.update('active');
+}
+
+/**
+ * Classe para gerenciar conexão WebSocket com worker MQTT
+ * @class
+ */
+class MqttDashboardConnector {
+    /**
+     * Cria uma nova instância do connector
+     * @param {string} wsUrl - URL do WebSocket
+     * @param {Function} onMessageCallback - Callback para mensagens recebidas
+     */
+    constructor(wsUrl, onMessageCallback) {
+        this.wsUrl = wsUrl;
+        this.onMessageCallback = onMessageCallback;
+        this.ws = null;
+        this.reconnectAttempts = 0;
+        this.maxReconnectAttempts = 5;
+    }
+    
+    /**
+     * Estabelece conexão WebSocket
+     * @returns {Promise<void>}
+     */
+    async connect() {
+        try {
+            this.ws = new WebSocket(this.wsUrl);
+            
+            this.ws.onopen = () => {
+                console.log('✅ Conectado ao MQTT Worker');
+                this.reconnectAttempts = 0;
+            };
+            
+            this.ws.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                this.onMessageCallback(data);
+            };
+            
+            this.ws.onerror = (error) => {
+                console.error('❌ Erro WebSocket:', error);
+            };
+            
+            this.ws.onclose = () => {
+                console.warn('⚠️ Conexão fechada. Tentando reconectar...');
+                this.reconnect();
+            };
+        } catch (error) {
+            console.error('Erro ao conectar:', error);
+            this.reconnect();
+        }
+    }
+    
+    /**
+     * Tenta reconectar ao WebSocket
+     * @private
+     */
+    reconnect() {
+        if (this.reconnectAttempts < this.maxReconnectAttempts) {
+            this.reconnectAttempts++;
+            const delay = Math.min(1000 * Math.pow(2, this.reconnectAttempts), 30000);
+            
+            console.log(`🔄 Reconectando em ${delay/1000}s (tentativa ${this.reconnectAttempts})`);
+            
+            setTimeout(() => this.connect(), delay);
+        } else {
+            console.error('❌ Máximo de tentativas de reconexão atingido');
+        }
     }
 }
