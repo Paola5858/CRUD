@@ -48,10 +48,19 @@ class DadosSensor(models.Model):
     """
     Modelo para armazenar dados coletados pelos sensores.
     """
-    data_hora = models.DateTimeField(auto_now=True, help_text="Data e hora da coleta", db_index=True)
-    motor = models.ForeignKey(Motor, on_delete=models.CASCADE, help_text="Motor relacionado")
-    sensor = models.ForeignKey(Sensor, on_delete=models.CASCADE, help_text="Sensor que coletou o dado")
+    data_hora = models.DateTimeField(auto_now_add=True, help_text="Data e hora da coleta", db_index=True)
+    motor = models.ForeignKey(Motor, on_delete=models.CASCADE, related_name='dados', help_text="Motor relacionado")
+    sensor = models.ForeignKey(Sensor, on_delete=models.CASCADE, related_name='dados', help_text="Sensor que coletou o dado")
     valor = models.FloatField(help_text="Valor coletado pelo sensor")
+    
+    # Campos extras IoT
+    temperatura = models.FloatField(null=True, blank=True)
+    rpm = models.IntegerField(null=True, blank=True)
+    pressao = models.FloatField(null=True, blank=True)
+    
+    # Metadados
+    fonte = models.CharField(max_length=50, default='MQTT')
+    raw_json = models.JSONField(null=True, blank=True)
 
     def __str__(self):
         return f"{self.motor.nome} - {self.sensor.tipo}: {self.valor}"
@@ -59,3 +68,7 @@ class DadosSensor(models.Model):
     class Meta:
         verbose_name = "Dado do Sensor"
         verbose_name_plural = "Dados dos Sensores"
+        ordering = ['-data_hora']
+        indexes = [
+            models.Index(fields=['-data_hora']),
+        ]

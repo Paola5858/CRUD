@@ -19,25 +19,7 @@ def welcome_api(request):
     logger.info(f"Request received: {request.method} {request.path}")
     return JsonResponse({"message": "Welcome to the MOTOSENSE API Service!"})
 
-@login_required
-def dashboard(request):
-    total_motores = Motor.objects.count()
-    total_sensores = Sensor.objects.count()
-    total_sensor_motor = SensorMotor.objects.count()
-    ultimos_dados = DadosSensor.objects.select_related('motor', 'sensor').order_by('-data_hora')[:10]
 
-    # Serialização dos dados para o gráfico
-    ultimos_dados_list = list(ultimos_dados.values('data_hora', 'valor', 'sensor__tipo', 'motor__nome'))
-    ultimos_dados_json = json.dumps(ultimos_dados_list, default=str)
-
-    context = {
-        'total_motores': total_motores,
-        'total_sensores': total_sensores,
-        'total_sensor_motor': total_sensor_motor,
-        'ultimos_dados': ultimos_dados,
-        'ultimos_dados_json': ultimos_dados_json,
-    }
-    return render(request, 'sensores/dashboard.html', context)
 
 class CrudView(LoginRequiredMixin, View):
     model_name = None

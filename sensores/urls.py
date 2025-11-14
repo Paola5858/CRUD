@@ -2,7 +2,7 @@ from django.urls import path
 from django.shortcuts import redirect
 from django.views.generic import RedirectView
 from . import views
-from .views_dashboard import dashboard
+from dashboard.views import dashboard_view
 
 app_name = 'sensores'
 
@@ -12,7 +12,7 @@ urlpatterns = [
         RedirectView.as_view(pattern_name="sensores:dashboard", permanent=False),
         name="home",
     ),
-    path("dashboard/", dashboard, name="dashboard"),
+    path("dashboard/", dashboard_view, name="dashboard"),
     path("welcome/", views.welcome_api, name="welcome_api"),
     path("motores/", views.ListarMotorView.as_view(), name="listar_motor"),
     path("motores/criar/", views.CriarMotorView.as_view(), name="criar_motor"),

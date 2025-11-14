@@ -1,0 +1,202 @@
+# worker.py - Worker MQTT com credenciais CloudAMQP
+import django
+import os
+import sys
+import json
+import time
+import logging
+import paho.mqtt.client as mqtt
+from datetime import datetime
+
+# ========== CONFIGURAR DJANGO ==========
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "setup.settings")
+django.setup()
+
+from sensores.models import DadosSensor, Motor, Sensor
+
+# ========== CONFIGURAR LOGGING ==========
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler("logs/mqtt_worker.log"),
+        logging.StreamHandler()
+    ]
+)
+logger = logging.getLogger(__name__)
+
+# ========== CONFIGURAÇÕES MQTT (CLOUDAMQP) ==========
+BROKER = "leopard.lmq.cloudamqp.com"
+PORT = 1883
+TOPIC = "dadosSensor"
+USERNAME = "idoufayf:idoufayf"
+PASSWORD = "DpH2tqSXK2l4s3tx5DNr3_ppS9aYGTis"
+CLIENT_ID = "motosense_worker_001"  # ID único
+
+# ========== VARIÁVEIS GLOBAIS ==========
+reconnect_count = 0
+max_reconnect_attempts = 10
+
+# ========== CALLBACK: CONEXÃO ==========
+def on_connect(client, userdata, flags, rc):
+    global reconnect_count
+    
+    if rc == 0:
+        logger.info("=" * 60)
+        logger.info("CONECTADO AO BROKER CLOUDAMQP!")
+        logger.info(f"Broker: {BROKER}")
+        logger.info(f"Topico: {TOPIC}")
+        logger.info("=" * 60)
+        
+        client.subscribe(TOPIC)
+        logger.info(f"Escutando mensagens no topico '{TOPIC}'...")
+        reconnect_count = 0
+        
+    else:
+        error_messages = {
+            1: "Protocolo incorreto",
+            2: "Client ID rejeitado",
+            3: "Servidor indisponível",
+            4: "Usuário/senha inválidos",
+            5: "Não autorizado"
+        }
+        logger.error(f"FALHA NA CONEXAO! Codigo: {rc} - {error_messages.get(rc, 'Erro desconhecido')}")
+
+# ========== CALLBACK: DESCONEXÃO ==========
+def on_disconnect(client, userdata, rc):
+    global reconnect_count
+    
+    if rc != 0:
+        logger.warning(f"⚠️ DESCONECTADO INESPERADAMENTE! Código: {rc}")
+        
+        if reconnect_count < max_reconnect_attempts:
+            reconnect_count += 1
+            wait_time = min(2 ** reconnect_count, 60)  # Exponential backoff
+            logger.info(f"🔄 Tentativa {reconnect_count}/{max_reconnect_attempts} em {wait_time}s...")
+            time.sleep(wait_time)
+        else:
+            logger.error("❌ Número máximo de tentativas de reconexão atingido!")
+
+# ========== CALLBACK: MENSAGEM RECEBIDA ==========
+def on_message(client, userdata, msg):
+    try:
+        # Decodificar payload
+        payload = msg.payload.decode('utf-8')
+        topic = msg.topic
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        
+        logger.info("=" * 60)
+        logger.info(f"MENSAGEM RECEBIDA [{timestamp}]")
+        logger.info(f"Topico: {topic}")
+        logger.info(f"Payload: {payload}")
+        logger.info("=" * 60)
+
+        # Parser JSON
+        data = json.loads(payload)
+        
+        # Validar estrutura
+        required_fields = ['motor_id', 'sensor_id', 'valor']
+        missing_fields = [field for field in required_fields if field not in data]
+        
+        if missing_fields:
+            logger.error(f"❌ JSON INVÁLIDO! Campos faltando: {missing_fields}")
+            logger.error(f"   Campos obrigatórios: {required_fields}")
+            return
+
+        # Buscar Motor e Sensor
+        try:
+            motor = Motor.objects.get(id=data['motor_id'])
+            logger.info(f"✅ Motor encontrado: {motor.nome} (ID: {motor.id})")
+        except Motor.DoesNotExist:
+            logger.error(f"❌ MOTOR NÃO ENCONTRADO! ID: {data['motor_id']}")
+            logger.error(f"   Cadastre o motor no Django Admin primeiro!")
+            return
+
+        try:
+            sensor = Sensor.objects.get(id=data['sensor_id'])
+            logger.info(f"✅ Sensor encontrado: {sensor.tipo} (ID: {sensor.id})")
+        except Sensor.DoesNotExist:
+            logger.error(f"❌ SENSOR NÃO ENCONTRADO! ID: {data['sensor_id']}")
+            logger.error(f"   Cadastre o sensor no Django Admin primeiro!")
+            return
+
+        # Criar registro no banco
+        dado = DadosSensor.objects.create(
+            motor=motor,
+            sensor=sensor,
+            valor=data['valor'],
+            temperatura=data.get('temperatura'),
+            rpm=data.get('rpm'),
+            pressao=data.get('pressao'),
+            fonte='MQTT',
+            raw_json=data
+        )
+
+        logger.info("=" * 60)
+        logger.info("DADOS SALVOS COM SUCESSO!")
+        logger.info(f"   ID do Registro: {dado.id}")
+        logger.info(f"   Motor: {motor.nome}")
+        logger.info(f"   Sensor: {sensor.tipo}")
+        logger.info(f"   Valor: {data['valor']}")
+        logger.info(f"   Timestamp: {dado.data_hora}")
+        logger.info("=" * 60)
+
+    except json.JSONDecodeError as e:
+        logger.error(f"❌ ERRO AO DECODIFICAR JSON: {e}")
+        logger.error(f"   Payload recebido: {payload}")
+    except Exception as e:
+        logger.error(f"❌ ERRO AO PROCESSAR MENSAGEM: {e}", exc_info=True)
+
+# ========== CALLBACK: LOG DE EVENTOS ==========
+def on_log(client, userdata, level, buf):
+    logger.debug(f"LOG MQTT: {buf}")
+
+# ========== INICIALIZAR WORKER ==========
+def start_worker():
+    logger.info("\n" + "=" * 60)
+    logger.info("INICIANDO WORKER MQTT MOTOSENSE")
+    logger.info("=" * 60)
+    logger.info(f"Broker: {BROKER}:{PORT}")
+    logger.info(f"Usuario: {USERNAME}")
+    logger.info(f"Topico: {TOPIC}")
+    logger.info("=" * 60 + "\n")
+    
+    # Criar diretório de logs se não existir
+    os.makedirs('logs', exist_ok=True)
+    
+    # Configurar cliente MQTT
+    client = mqtt.Client(
+        client_id=CLIENT_ID,
+        clean_session=True,
+        protocol=mqtt.MQTTv311
+    )
+    
+    # Configurar autenticação CloudAMQP
+    client.username_pw_set(USERNAME, PASSWORD)
+    
+    # Registrar callbacks
+    client.on_connect = on_connect
+    client.on_disconnect = on_disconnect
+    client.on_message = on_message
+    client.on_log = on_log
+    
+    try:
+        logger.info(f"Conectando ao broker CloudAMQP...")
+        client.connect(BROKER, PORT, 60)
+        
+        logger.info("Worker rodando. Aguardando mensagens MQTT...")
+        logger.info("   (Pressione Ctrl+C para parar)\n")
+        
+        # Loop infinito
+        client.loop_forever()
+        
+    except KeyboardInterrupt:
+        logger.info("\n⏹️ Worker interrompido pelo usuário.")
+        client.disconnect()
+        sys.exit(0)
+    except Exception as e:
+        logger.error(f"❌ ERRO FATAL: {e}", exc_info=True)
+        sys.exit(1)
+
+if __name__ == "__main__":
+    start_worker()
