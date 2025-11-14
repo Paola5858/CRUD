@@ -1,0 +1,41 @@
+@media print {
+  /* Ocultar sidebar e botões */
+  .sidebar,
+  .btn,
+  .hamburger-btn {
+    display: none !important;
+  }
+  
+  /* Ajustar layout */
+  .main-content {
+    margin-left: 0 !important;
+    width: 100% !important;
+  }
+  
+  /* Ajustar cores para impressão */
+  body {
+    background: white !important;
+    color: black !important;
+  }
+  
+  .card {
+    border: 1px solid #ccc !important;
+    page-break-inside: avoid;
+  }
+  
+  /* Forçar quebra de página */
+  .page-break {
+    page-break-after: always;
+  }
+  
+  /* Otimizar gráficos para impressão */
+  .chart-container {
+    height: 300px !important;
+  }
+  
+  /* Remover sombras e efeitos */
+  * {
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+}
